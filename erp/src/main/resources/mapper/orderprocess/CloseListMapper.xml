@@ -1,0 +1,213 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.futuremap.erp.module.orderprocess.mapper.CloseListMapper">
+    <resultMap id="resultMap" type="com.futuremap.erp.module.orderprocess.entity.CloseOrder"/>
+    <select id="sum" resultMap="resultMap"
+            parameterType="com.futuremap.erp.module.orderprocess.entity.CloseOrderQuery">
+        SELECT
+        sum(`imoney`) imoney,
+        sum(`inatmoney`) inatmoney,
+        sum(`isum`) isum,
+        sum(`inatsum`) inatsum,
+        sum(`iamount`) iamount,
+        sum(`iamount_fob`) iamount_fob,
+        sum(`payable_money`) payable_money,
+        sum(`paid_money`) paid_money,
+        sum(`no_pay`) no_pay
+        FROM
+        close_order
+        <where>
+            <if test="closeOrderQuery.id !=null">
+                and id = #{closeOrderQuery.id}
+            </if>
+            <if test="closeOrderQuery.startDate!=null ">
+                and dpodate >= #{closeOrderQuery.startDate}
+            </if>
+            <if test="closeOrderQuery.endDate!=null ">
+                <![CDATA[   and dpodate < #{closeOrderQuery.endDate}]]>
+            </if>
+            <if test = "closeOrderQuery.csocode!=null and closeOrderQuery.csocode !=''">
+                and csocode = #{closeOrderQuery.csocode}
+            </if>
+            <if test = "closeOrderQuery.irowno !=null">
+                and irowno = #{closeOrderQuery.irowno}
+            </if>
+            <if test="closeOrderQuery.startDvouchDate!=null ">
+                and dvouch_date >= #{closeOrderQuery.startDvouchDate}
+            </if>
+            <if test="closeOrderQuery.endDvouchDate!=null ">
+                <![CDATA[   and dvouch_date < #{closeOrderQuery.endDvouchDate}]]>
+            </if>
+            <if test = "closeOrderQuery.companyCode !=null">
+                and company_code = #{closeOrderQuery.companyCode}
+            </if>
+            <if test = "closeOrderQuery.cvenname!=null and closeOrderQuery.cvenname !=''">
+                and cvenname like  CONCAT("%",#{closeOrderQuery.cvenName},"%")
+            </if>
+            <if test = "closeOrderQuery.cpoid!=null and closeOrderQuery.cpoid !=''">
+                and cpoid = #{closeOrderQuery.cpoid}
+            </if>
+
+        </where>
+
+
+    </select>
+
+    <select id="findList" resultMap="resultMap"
+            parameterType="com.futuremap.erp.module.orderprocess.entity.CloseOrderQuery">
+        SELECT
+        `id`,
+        `company_code`,
+        `company_name`,
+        `cpoid`,
+        `csocode`,
+        `irowno`,
+        `cvenname`,
+        `dpodate`,
+        `ap_cexch_name`,
+        `imoney`,
+        `inatmoney`,
+        `ccus_abbname`,
+        `ccus_name`,
+        `isum`,
+        `inatsum`,
+        `dvouch_date`,
+        `ar_cexch_name`,
+        `iamount`,
+        `iamount_fob`,
+        payable_money,
+        paid_money,
+        no_pay
+        FROM
+        close_order
+        <where>
+            <if test="closeOrderQuery.id !=null">
+                and id = #{closeOrderQuery.id}
+            </if>
+            <if test="closeOrderQuery.startDate!=null ">
+                and dpodate >= #{closeOrderQuery.startDate}
+            </if>
+            <if test="closeOrderQuery.endDate!=null ">
+                <![CDATA[   and dpodate < #{closeOrderQuery.endDate}]]>
+            </if>
+            <if test = "closeOrderQuery.csocode!=null and closeOrderQuery.csocode !=''">
+                and csocode = #{closeOrderQuery.csocode}
+            </if>
+            <if test = "closeOrderQuery.irowno !=null">
+                and irowno = #{closeOrderQuery.irowno}
+            </if>
+            <if test="closeOrderQuery.startDvouchDate!=null ">
+                and dvouch_date >= #{closeOrderQuery.startDvouchDate}
+            </if>
+            <if test="closeOrderQuery.endDvouchDate!=null ">
+                <![CDATA[   and dvouch_date < #{closeOrderQuery.endDvouchDate}]]>
+            </if>
+            <if test = "closeOrderQuery.companyCode !=null">
+                and company_code = #{closeOrderQuery.companyCode}
+            </if>
+            <if test = "closeOrderQuery.cvenname!=null and closeOrderQuery.cvenname !=''">
+                and cvenname like  CONCAT("%",#{closeOrderQuery.cvenName},"%")
+            </if>
+            <if test = "closeOrderQuery.cpoid!=null and closeOrderQuery.cpoid !=''">
+                and cpoid = #{closeOrderQuery.cpoid}
+            </if>
+
+        </where>
+
+
+    </select>
+
+    <select id="sumByCsocode" resultMap="resultMap"
+            parameterType="com.futuremap.erp.module.orderprocess.entity.CloseOrderQuery">
+        SELECT
+        sum(`imoney`) imoney,
+        sum(`inatmoney`) inatmoney,
+        sum(`isum`) isum,
+        sum(`inatsum`) inatsum,
+        sum(`iamount`) iamount,
+        sum(`iamount_fob`) iamount_fob,
+        sum(`payable_money`) payable_money,
+        sum(`paid_money`) paid_money,
+        sum(`no_pay`) no_pay
+        FROM
+        close_order
+        <where>
+            <if test="closeOrderQuery.id !=null">
+                and id = #{closeOrderQuery.id}
+            </if>
+            <if test="closeOrderQuery.startDate!=null ">
+                and dpodate >= #{closeOrderQuery.startDate}
+            </if>
+            <if test="closeOrderQuery.endDate!=null ">
+                <![CDATA[   and dpodate< #{closeOrderQuery.endDate}]]>
+            </if>
+            <if test = "closeOrderQuery.csocode!=null and closeOrderQuery.csocode !=''">
+                and csocode = #{closeOrderQuery.csocode}
+            </if>
+            <if test = "closeOrderQuery.irowno !=null">
+                and irowno = #{closeOrderQuery.irowno}
+            </if>
+            <if test="closeOrderQuery.startDvouchDate!=null ">
+                and dvouch_date >= #{closeOrderQuery.startDvouchDate}
+            </if>
+            <if test="closeOrderQuery.endDvouchDate!=null ">
+                <![CDATA[   and dvouch_date < #{closeOrderQuery.endDvouchDate}]]>
+            </if>
+
+        </where>
+
+
+    </select>
+
+    <select id="findByCsocode" resultMap="resultMap"
+            parameterType="com.futuremap.erp.module.orderprocess.entity.CloseOrderQuery">
+        SELECT
+        `id`,
+        `company_code`,
+        `company_name`,
+        `cpoid`,
+        `csocode`,
+        `irowno`,
+        `cvenname`,
+        `dpodate`,
+        `ap_cexch_name`,
+        `imoney`,
+        `inatmoney`,
+        `ccus_abbname`,
+        `ccus_name`,
+        `isum`,
+        `inatsum`,
+        `dvouch_date`,
+        `ar_cexch_name`,
+        `iamount`,
+        `iamount_fob`
+
+        FROM
+        close_order
+        <where>
+            <if test="closeOrderQuery.id !=null">
+                and id = #{closeOrderQuery.id}
+            </if>
+            <if test="closeOrderQuery.startDate!=null ">
+                and dpodate >= #{closeOrderQuery.startDate}
+            </if>
+            <if test="closeOrderQuery.endDate!=null ">
+                <![CDATA[   and dpodate< #{closeOrderQuery.endDate}]]>
+            </if>
+            <if test = "closeOrderQuery.csocode!=null and closeOrderQuery.csocode !=''">
+                and csocode = #{closeOrderQuery.csocode}
+            </if>
+            <if test = "closeOrderQuery.irowno !=null">
+                and irowno = #{closeOrderQuery.irowno}
+            </if>
+            <if test="closeOrderQuery.startDvouchDate!=null ">
+                and dvouch_date >= #{closeOrderQuery.startDvouchDate}
+            </if>
+            <if test="closeOrderQuery.endDvouchDate!=null ">
+                <![CDATA[   and dvouch_date < #{closeOrderQuery.endDvouchDate}]]>
+            </if>
+
+        </where>
+        group by  csocode,irowno
+    </select>
+</mapper>

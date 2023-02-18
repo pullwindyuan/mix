@@ -1,0 +1,108 @@
+server:
+  port:  8080
+
+redis:
+  database: 0
+  host: 127.0.0.1
+  port: 6379
+  password:
+
+rabbitmq: # 不同服务使用相同nameSpace，相同virtualHost，相同交换机和队列名称的情况下可以队列共享
+  nameSpace: PAYCENTER
+  host: 127.0.0.1
+  port: 5672
+  virtualHost: /
+  username: guest
+  password: guest
+
+spring:
+  profiles: dev
+  datasource:
+    dynamic:
+      primary: master #设置默认的数据源或者数据源组,默认值即为master
+      strict: false #设置严格模式,默认false不启动. 启动后在未匹配到指定数据源时候会抛出异常,不启动则使用默认数据源.
+      datasource: 
+        master: 
+          url: jdbc:mysql://119.23.35.193:35001/custom?useUnicode=true&characterEncoding=UTF-8&autoReconnect=true&zeroDateTimeBehavior=convertToNull&useSSL=false&serverTimezone=GMT%2B8
+          username: custom
+          password: 9Qhb5OaAS6eJYqAV
+          driver-class-name: com.mysql.jdbc.Driver # 3.2.0开始支持SPI可省略此配置
+  data:
+    mongodb:
+      host: 119.23.35.193
+      port: 27017
+      username:  alpha
+      password: 0cZPO0xwc1q9j8Ip
+      database: test
+  redis:
+    database: ${redis.database}
+    host: ${redis.host}
+    port: ${redis.port}
+    password: ${redis.password}
+    lettuce:
+      pool:
+        max-idle: 20
+  rabbitmq:
+    host: ${rabbitmq.host}
+    port: ${rabbitmq.port}
+    virtualHost: ${rabbitmq.virtualHost}
+    username: ${rabbitmq.username}
+    password: ${rabbitmq.password}
+    #    支持发布确认
+    #      publisher-confirms: true
+    #    支持发布返回
+    #      publisher-returns: true
+    listener:
+      simple:
+        #      采用手动应答
+        #acknowledge-mode: manual
+        acknowledge-mode: auto
+        #        当前监听容器数
+        concurrency: 1
+        #        最大数
+        max-concurrency: 1
+        #        是否支持重试
+        retry:
+          enabled: true
+  web:
+    resources:
+      static-locations: classpath:templates/
+
+mybatis-plus:
+  mapper-locations: classpath:mapper/*.xml
+        #实体扫描，多个package用逗号或者分号分隔
+  typeAliasesPackage: com.futuremap.custom.entity
+  global-config:
+    #主键类型  0:"数据库ID自增", 1:"用户输入ID",2:"全局唯一ID (数字类型唯一ID)", 3:"全局唯一ID UUID";
+    id-type: 0
+    #字段策略 0:"忽略判断",1:"非 NULL 判断"),2:"非空判断"
+    field-strategy: 2
+    #驼峰下划线转换
+    db-column-underline: true
+    logic-delete-value: 1
+    logic-not-delete-value: 0
+  configuration:
+    map-underscore-to-camel-case: true
+    cache-enabled: false
+#文件上传目录
+prop:
+  upload-folder: /usr/local/wwwroot/data/
+  download-url: http://test.custom.futuremap.com.cn/upload/
+swagger.enable: true
+security:
+  token:
+    header: X-Auth-Token
+    secret: ca$hc0w1!
+socketio:
+  port: 8091
+mapper:
+  mappers: org.modelmapper.ModelMapper
+management:
+  endpoints:
+    web:
+      exposure:
+        include: "*"
+spring.servlet.multipart.max-file-size: 3MB
+spring.servlet.multipart.max-request-size: 5MB
+
+# spring.main.allow-bean-definition-overriding: true

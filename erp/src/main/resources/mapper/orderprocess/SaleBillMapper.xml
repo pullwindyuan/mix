@@ -1,0 +1,205 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.futuremap.erp.module.orderprocess.mapper.SaleBillMapper">
+    <resultMap id="resultMap" type="com.futuremap.erp.module.orderprocess.dto.PurchBillDto"/>
+    <select id="sum" resultMap="resultMap"
+            parameterType="com.futuremap.erp.module.orderprocess.entity.SaleBillQuery">
+        SELECT
+        `id`,
+        `company_code`,
+        `company_name`,
+        s.`cpersoncode`,
+        s.`cpersonname`,
+        s.`csocode`,
+        s.`irowno`,
+        `ccus_code`,
+        `ccus_name`,
+        `cinvcode`,
+        `ddate`,
+        `bill_code`,
+        `cexch_name`,
+        `bill_nat_money`,
+        `bill_money`,
+        `dvouch_date`,
+        `receipt_code`,
+        `conlection_money`,
+        `conlection_nat_money`,
+        `no_conlection_money`,
+        t.countMoney
+
+        FROM
+        sale_bill s
+        left join ( select csocode,irowno,sum(conlection_nat_money) countMoney from sale_bill
+        <where>
+            <if test="saleBillQuery.id !=null">
+                and id = #{saleBillQuery.id}
+            </if>
+            <if test="saleBillQuery.startDate!=null ">
+                and ddate >= #{saleBillQuery.startDate}
+            </if>
+            <if test="saleBillQuery.endDate!=null ">
+                <![CDATA[   and ddate < #{saleBillQuery.endDate}]]>
+            </if>
+            <if test = "saleBillQuery.csocode!=null and saleBillQuery.csocode !=''">
+                and csocode = #{saleBillQuery.csocode}
+            </if>
+            <if test = "saleBillQuery.irowno !=null">
+                and irowno = #{saleBillQuery.irowno}
+            </if>
+            <if test="saleBillQuery.startDvouchDate!=null ">
+                and dvouch_date >= #{saleBillQuery.startDvouchDate}
+            </if>
+            <if test="saleBillQuery.endDvouchDate!=null ">
+                <![CDATA[   and dvouch_date < #{saleBillQuery.endDvouchDate}]]>
+            </if>
+            <if test = "saleBillQuery.companyCode !=null">
+                and company_code = #{saleBillQuery.companyCode}
+            </if>
+            <if test = "saleBillQuery.ccusName!=null and saleBillQuery.ccusName !=''">
+                and ccus_name like  CONCAT("%",#{saleBillQuery.ccusName},"%")
+            </if>
+
+
+        </where>
+        group by csocode,irowno
+        ) t on s.csocode = t.csocode and s.irowno=t.irowno
+
+        <where>
+            conlection_nat_money > 0
+            <if test="saleBillQuery.id !=null">
+                and id = #{saleBillQuery.id}
+            </if>
+            <if test="saleBillQuery.startDate!=null ">
+                and ddate >= #{saleBillQuery.startDate}
+            </if>
+            <if test="saleBillQuery.endDate!=null ">
+                <![CDATA[   and ddate < #{saleBillQuery.endDate}]]>
+            </if>
+            <if test = "saleBillQuery.csocode!=null and saleBillQuery.csocode !=''">
+                and s.csocode = #{saleBillQuery.csocode}
+            </if>
+            <if test = "saleBillQuery.irowno !=null">
+                and s.irowno = #{saleBillQuery.irowno}
+            </if>
+            <if test="saleBillQuery.startDvouchDate!=null ">
+                and dvouch_date >= #{saleBillQuery.startDvouchDate}
+            </if>
+            <if test="saleBillQuery.endDvouchDate!=null ">
+                <![CDATA[   and dvouch_date < #{saleBillQuery.endDvouchDate}]]>
+            </if>
+            <if test = "saleBillQuery.companyCode !=null">
+                and company_code = #{saleBillQuery.companyCode}
+            </if>
+            <if test = "saleBillQuery.ccusName!=null and saleBillQuery.ccusName !=''">
+                and ccus_name like  CONCAT("%",#{saleBillQuery.ccusName},"%")
+            </if>
+
+        </where>
+    </select>
+    <select id="findList" resultMap="resultMap"
+            parameterType="com.futuremap.erp.module.orderprocess.entity.SaleBillQuery">
+    SELECT
+        `id`,
+        `company_code`,
+        `company_name`,
+        s.`cpersoncode`,
+        s.`cpersonname`,
+        s.`csocode`,
+        s.`irowno`,
+        `ccus_code`,
+        `ccus_name`,
+        `cinvcode`,
+        s.`ddate`,
+        `bill_code`,
+        `cexch_name`,
+        `bill_nat_money`,
+        `bill_money`,
+        `dvouch_date`,
+        `receipt_code`,
+        `conlection_money`,
+        `conlection_nat_money`,
+        `no_conlection_money`,
+        t.countMoney,
+        if(TIMESTAMPDIFF(DAY,DATE_FORMAT(NOW(), '%Y-%m-%d %H:%i:%S'),DATE_FORMAT(so.ddate, '%Y-%m-%d %H:%i:%S'))>back_day,'RECEIVE_DELAY','EMPTY') warningName
+    FROM
+     sale_bill s
+        left join (
+                select order_amount_mgr.customer_code, order_amount_mgr.back_day from order_amount_mgr
+                ) oam on oam.customer_code = s.ccus_code
+        left join (
+                select saleout_list.csocode,saleout_list.irowno,saleout_list.ddate from saleout_list
+                ) so on 1=1
+                <if test = "saleBillQuery.csocode!=null and saleBillQuery.csocode !=''">
+                    and so.csocode = #{saleBillQuery.csocode}
+                </if>
+                <if test = "saleBillQuery.irowno !=null">
+                    and so.irowno = #{saleBillQuery.irowno}
+                </if>
+         left join ( select csocode,irowno,sum(conlection_nat_money) countMoney from sale_bill
+        <where>
+            <if test="saleBillQuery.id !=null">
+                and id = #{saleBillQuery.id}
+            </if>
+            <if test="saleBillQuery.startDate!=null ">
+                and ddate >= #{saleBillQuery.startDate}
+            </if>
+            <if test="saleBillQuery.endDate!=null ">
+                <![CDATA[   and ddate < #{saleBillQuery.endDate}]]>
+            </if>
+            <if test = "saleBillQuery.csocode!=null and saleBillQuery.csocode !=''">
+                and csocode = #{saleBillQuery.csocode}
+            </if>
+            <if test = "saleBillQuery.irowno !=null">
+                and irowno = #{saleBillQuery.irowno}
+            </if>
+            <if test="saleBillQuery.startDvouchDate!=null ">
+                and dvouch_date >= #{saleBillQuery.startDvouchDate}
+            </if>
+            <if test="saleBillQuery.endDvouchDate!=null ">
+                <![CDATA[   and dvouch_date < #{saleBillQuery.endDvouchDate}]]>
+            </if>
+            <if test = "saleBillQuery.companyCode !=null">
+                and company_code = #{saleBillQuery.companyCode}
+            </if>
+            <if test = "saleBillQuery.ccusName!=null and saleBillQuery.ccusName !=''">
+                and ccus_name like  CONCAT("%",#{saleBillQuery.ccusName},"%")
+            </if>
+
+
+        </where>
+        group by csocode,irowno
+        ) t on s.csocode = t.csocode and s.irowno=t.irowno
+
+    <where>
+        conlection_nat_money > 0
+        <if test="saleBillQuery.id !=null">
+            and id = #{saleBillQuery.id}
+        </if>
+        <if test="saleBillQuery.startDate!=null ">
+            and ddate >= #{saleBillQuery.startDate}
+        </if>
+        <if test="saleBillQuery.endDate!=null ">
+            <![CDATA[   and ddate < #{saleBillQuery.endDate}]]>
+        </if>
+        <if test = "saleBillQuery.csocode!=null and saleBillQuery.csocode !=''">
+            and s.csocode = #{saleBillQuery.csocode}
+        </if>
+        <if test = "saleBillQuery.irowno !=null">
+            and s.irowno = #{saleBillQuery.irowno}
+        </if>
+        <if test="saleBillQuery.startDvouchDate!=null ">
+            and dvouch_date >= #{saleBillQuery.startDvouchDate}
+        </if>
+        <if test="saleBillQuery.endDvouchDate!=null ">
+            <![CDATA[   and dvouch_date < #{saleBillQuery.endDvouchDate}]]>
+        </if>
+        <if test = "saleBillQuery.companyCode !=null">
+            and company_code = #{saleBillQuery.companyCode}
+        </if>
+        <if test = "saleBillQuery.ccusName!=null and saleBillQuery.ccusName !=''">
+            and ccus_name like  CONCAT("%",#{saleBillQuery.ccusName},"%")
+        </if>
+
+    </where>
+    </select>
+</mapper>

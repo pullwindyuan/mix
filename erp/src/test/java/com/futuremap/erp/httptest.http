@@ -1,0 +1,285 @@
+
+
+
+###
+POST http://localhost:8080/orderprocess/purchOrder/listPage/1/10
+Accept: */*
+Cache-Control: no-cache
+Content-Type:application/json
+#X-Auth-Token:Bearer eyJhbGciOiJIUzUxMiJ9.eyJzdWIiOiIxNTc1NzgyOTc1OSIsImNyZWF0ZWQiOjE2MjQ0MTU0MDk2ODgsImV4cCI6MTYyNTAyMDIwOX0.3_cF99ay-6YqG6A2yCLOWRrsct8AJDWKYR7O-1J7z8VXmwYayAKs7AVI1Y94h2ft73C-i-HNQkpqIdwcsgZnAA
+
+{"csocode":"SC2020088","irowno":2,"size":10,"current":1}
+//  "cvenName":"19911"
+//  "size": 10,
+//  "current": 1
+//  "csocode": "WT2020111E",
+//  "cpoid": "01WT2020111DQ"
+
+###
+POST http://localhost:8080/orderprocess/closeList/dvouchlistPage/1/10
+Accept: */*
+Cache-Control: no-cache
+Content-Type:application/json
+
+{
+  "csocode": "WT2020111E"
+}
+
+
+###
+POST http://localhost:8080/orderprocess/closeList/listPage/1/10
+Accept: */*
+Cache-Control: no-cache
+Content-Type:application/json
+
+{
+  "csocode": "WT2020111E"
+}
+
+
+###
+POST http://localhost:8080/orderprocess/saleout/listPage/1/10
+Accept: */*
+Cache-Control: no-cache
+Content-Type:application/json
+
+{
+  "csocode": "NF2020276E-NL-Revised"
+}
+
+###
+POST http://localhost:8080/orderprocess/recordin/listPage/1/10
+Accept: */*
+Cache-Control: no-cache
+Content-Type:application/json
+
+{
+  "csocode": "WT2020111E"
+}
+
+
+###
+POST http://localhost:8080/quotation/total/listPage
+Accept: */*
+Cache-Control: no-cache
+Content-Type:application/json
+
+{
+"size": 10,
+"current": 2,
+"csocode": "WT2020111E",
+  "startDate": "2020-01-01",
+  "endDate": "2021-06-01"
+}
+
+
+###
+POST http://localhost:8080/operation/operatingStatement/list
+Accept: */*
+Cache-Control: no-cache
+Content-Type:application/json
+X-Auth-Token:Bearer eyJhbGciOiJIUzUxMiJ9.eyJzdWIiOiIxMzQxMjM0NTY3OCIsImNyZWF0ZWQiOjE2MjQyMzg1ODYyODQsImV4cCI6MTYyNDg0MzM4Nn0.VW_J9xsg0qWlSbDI1Pe8mi3g51UNQMphfAG-mZnLh06UtCdoHEDwUhzKoz-7RisEN95-uOpaeHotuxrlUpYLsQ
+
+{
+  "startDate": "202101",
+  "endDate": "202102"
+}
+
+
+###
+POST http://localhost:8080/operation/operatingStatement/update
+Accept: */*
+Cache-Control: no-cache
+Content-Type:application/json
+
+
+[{"id": 961,
+    "isum": 123
+    },{
+    "id": 962,
+    "isum": 123
+    }
+]
+
+
+
+###
+POST  http://localhost:8080/quotation/fileUpload
+#Token
+#Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VyX3R
+Cache-Control: no-cache
+#请求类型
+Content-Type: multipart/form-data; boundary=WebAppBoundary
+
+# name接口定义的参数名，filename 文件名（我们可以自己取名字）
+--WebAppBoundary
+Content-Disposition: form-data; name="file"; filename="quotation.xlsx"
+Content-Type: multipart/form-data
+
+#文件地址
+< F:\mingo\workspace\futuremap-erp\src\main\resources\quotation.xlsx
+--WebAppBoundary--
+
+
+###
+POST http://localhost:8080/sys/register
+Accept: */*
+Cache-Control: no-cache
+Content-Type:application/json
+
+{
+  "phone": "13412345678",
+  "password": "12345678"
+}
+
+###
+POST http://localhost:8080/sys/login
+Accept: */*
+Cache-Control: no-cache
+Content-Type:application/json
+
+{
+  "phone": "13412345678",
+  "password": "12345678Qq"
+}
+
+
+###
+POST http://localhost:8080/sys/refreshToken
+Accept: */*
+Cache-Control: no-cache
+Content-Type:application/json
+
+{
+  "token": "eyJhbGciOiJIUzUxMiJ9.eyJzdWIiOiIxNTc1NzgyOTc1OSIsImNyZWF0ZWQiOjE2MjQ0MTU0MDk2ODgsImV4cCI6MTYyNTAyMDIwOX0.3_cF99ay-6YqG6A2yCLOWRrsct8AJDWKYR7O-1J7z8VXmwYayAKs7AVI1Y94h2ft73C-i-HNQkpqIdwcsgZnAA"
+}
+###
+POST http://localhost:8080/auth/role/list
+Accept: */*
+Cache-Control: no-cache
+Content-Type:application/json
+
+{
+}
+
+###
+POST http://localhost:8080/auth/user/list
+Accept: */*
+Cache-Control: no-cache
+Content-Type:application/json
+X-AUTH-TOKEN: Bearer eyJhbGciOiJIUzUxMiJ9.eyJzdWIiOiIxMzQxMjM0NTY3OCIsImNyZWF0ZWQiOjE2MjgxMzIwNzMwNjUsImV4cCI6MTYyODczNjg3M30.ddBFbKdcBbA7J3Q8VtDtiWt5Y3Xg-h5Q7MNgy_kPCmGwoi7WnpbNTFBMOGrWzPE0c4jh26YFYFrHxMGgAZcsSQ
+
+{
+}
+
+###
+POST http://localhost:8080/auth/user/currentUser
+Accept: */*
+Cache-Control: no-cache
+Content-Type:application/json
+X-AUTH-TOKEN: Bearer eyJhbGciOiJIUzUxMiJ9.eyJzdWIiOiIxMzQxMjM0NTY3OCIsImNyZWF0ZWQiOjE2MjgxMzIwNzMwNjUsImV4cCI6MTYyODczNjg3M30.ddBFbKdcBbA7J3Q8VtDtiWt5Y3Xg-h5Q7MNgy_kPCmGwoi7WnpbNTFBMOGrWzPE0c4jh26YFYFrHxMGgAZcsSQ
+
+{
+}
+
+
+###
+POST http://localhost:8080/auth/user/reset
+Accept: */*
+Cache-Control: no-cache
+Content-Type:application/json
+
+{"id":356,"oldPassword":"12345678Qq","newPassword":"12345678Qw"}
+
+
+
+###
+POST http://localhost:8080/auth/user/update
+Accept: */*
+Cache-Control: no-cache
+Content-Type:application/json
+
+//{"id":361,"name":"账号1001","phone":"15757666463","code":"10613","role":null,"password":"","roles":[{"id":2,"roleName":"salesman","roleDesc":"业务员","detail":"","__index":1}]}
+{"id":361,"name":"账号1001","phone":"15757666463","code":"10613","role":null,"password":"","roles":[{"id":3,"roleName":"purchaser","roleDesc":"采购员","detail":"","__index":2}]}
+###
+POST http://localhost:8080/comp/companyInfo/list
+Accept: */*
+Cache-Control: no-cache
+Content-Type:application/json
+
+{
+
+}
+
+
+###
+POST http://localhost:8080/saleorder/listPage/1/10
+Accept: */*
+Cache-Control: no-cache
+Content-Type:application/json
+X-AUTH-TOKEN: Bearer eyJhbGciOiJIUzUxMiJ9.eyJzdWIiOiIxNTc1NzgyOTc1OSIsImNyZWF0ZWQiOjE2MjY0MjE2MTQyMDUsImV4cCI6MTYyNzAyNjQxNH0.WDb4dB07cqaVkR9D8FTljR9ZkDdOC9c_6UjbPwk2ZVWKf-MIcC7c5SD5ykqHdqmGKOoN-nu2Z8VSF9dHK1Ecag
+
+{"startDate":"2021-02-03T16:00:00.000Z","endDate":"2021-05-12T16:00:00.000Z","size":30,"current":1}
+###
+POST http://localhost:8080/saleorder/update
+Accept: */*
+Cache-Control: no-cache
+Content-Type:application/json
+X-AUTH-TOKEN: Bearer eyJhbGciOiJIUzUxMiJ9.eyJzdWIiOiIxNTc1NzgyOTc1OSIsImNyZWF0ZWQiOjE2MjY0MjE2MTQyMDUsImV4cCI6MTYyNzAyNjQxNH0.WDb4dB07cqaVkR9D8FTljR9ZkDdOC9c_6UjbPwk2ZVWKf-MIcC7c5SD5ykqHdqmGKOoN-nu2Z8VSF9dHK1Ecag
+
+{"id":264881,"exceptionCost": 123}
+
+###
+POST http://localhost:8080/orderprocess/closeList/listPage/1/30
+Accept: */*
+Cache-Control: no-cache
+Content-Type:application/json
+
+{
+}
+###
+POST http://localhost:8080/orderprocess/saleout/listPage/1/10
+Accept: */*
+Cache-Control: no-cache
+Content-Type:application/json
+
+{"csocode":"SC2020088","irowno":1,"size":10,"current":1}
+###
+POST http://localhost:8080/orderprocess/recordin/listPage/1/10
+Accept: */*
+Cache-Control: no-cache
+Content-Type:application/json
+
+{"csocode":"SC2020088","irowno":1,"size":10,"current":1}
+
+###
+POST http://localhost:8080/orderprocess/purchSaleBill/listPage/1/10
+Accept: */*
+Cache-Control: no-cache
+Content-Type:application/json
+X-AUTH-TOKEN: Bearer eyJhbGciOiJIUzUxMiJ9.eyJzdWIiOiIxMzQxMjM0NTY3OCIsImNyZWF0ZWQiOjE2MjgxMzIwNzMwNjUsImV4cCI6MTYyODczNjg3M30.ddBFbKdcBbA7J3Q8VtDtiWt5Y3Xg-h5Q7MNgy_kPCmGwoi7WnpbNTFBMOGrWzPE0c4jh26YFYFrHxMGgAZcsSQ
+
+//{"paymentFlag": 1}
+//{"cordercode":"SC2020088"}
+{"startDate":"2021-06-01 00:00:00","endDate":"2021-06-30 23:59:59","companyCode":"9999","paymentFlag":0,"current":1,"size":30}
+###
+POST http://localhost:8080/orderprocess/saleBill/listPage/1/10
+Accept: */*
+Cache-Control: no-cache
+Content-Type:application/json
+
+{"csocode":"SC2020088"}
+
+
+###
+POST http://localhost:8080/orderprocess/purchOrder/listPage/1/10
+Accept: */*
+Cache-Control: no-cache
+Content-Type:application/json
+X-AUTH-TOKEN: Bearer eyJhbGciOiJIUzUxMiJ9.eyJzdWIiOiIxMzQxMjM0NTY3OCIsImNyZWF0ZWQiOjE2MjgxMzIwNzMwNjUsImV4cCI6MTYyODczNjg3M30.ddBFbKdcBbA7J3Q8VtDtiWt5Y3Xg-h5Q7MNgy_kPCmGwoi7WnpbNTFBMOGrWzPE0c4jh26YFYFrHxMGgAZcsSQ
+
+{}
+
+
+
+

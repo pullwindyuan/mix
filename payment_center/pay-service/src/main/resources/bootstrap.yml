@@ -1,0 +1,22 @@
+spring:
+    profiles:
+       active: dev
+       #active: platform
+    # feignClient可以有重复ID
+    main:
+        allow-bean-definition-overriding: true
+    application:
+        name: payment-service
+    cloud:
+        nacos:
+            discovery:
+                server-addr: 192.168.1.211:8848
+                heart-beat-interval: 5000
+                heart-beat-timeout: 15000
+            config:
+                server-addr: 192.168.1.211:8848
+                file-extension: yml
+
+    zipkin:
+        base-url: http://localhost:9411/
+        discovery-client-enabled: false

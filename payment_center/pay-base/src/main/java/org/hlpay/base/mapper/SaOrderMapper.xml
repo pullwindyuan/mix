@@ -1,0 +1,204 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="org.hlpay.base.mapper.SaOrderMapper" >
+  <resultMap id="saOrderMap" type="org.hlpay.base.model.SaOrder" >
+    <id column="DEAL_ORDER_ID" property="dealOrderId"/>
+    <result column="PROXY_ID" property="proxyId"/>
+    <result column="DEAL_RECORD_NUMBER" property="dealRecordNumber"/>
+    <result column="MERCHANT_ORDER_NUMBER" property="merchantOrderNumber"/>
+    <result column="DEAL_TYPE" property="dealType"/>
+    <result column="PRODUCT_TYPE" property="productType"/>
+    <result column="CALCULATE_TIME" property="calculateTime"/>
+    <result column="ORDER_AMOUNT" property="orderAmount"/>
+    <result column="DEAL_BRING_SCORE_TYPE" property="dealBringScoreType"/>
+    <result column="DEAL_BRING_SCORE_RATE" property="dealBringScoreRate"/>
+    <result column="SCORE_RETURN_AMOUNT" property="scoreReturnAmount"/>
+    <result column="USER_AMOUNT" property="userAmount"/>
+    <result column="PARTNER_AMOUNT" property="partnerAmount"/>
+    <result column="DEAL_COMMENT" property="dealComment"/>
+    <result column="DEAL_STATUS" property="dealStatus"/>
+    <result column="DEAL_CREATE_TIME" property="dealCreateTime"/>
+    <result column="DEAL_END_TIME" property="dealEndTime"/>
+    <result column="USER_ID" property="userId"/>
+    <result column="IS_DELETE" property="isDelete"/>
+    <result column="FLAG" property="flag"/>
+    <result column="STATUS" property="status"/>
+  </resultMap>
+
+  <!--表名 -->
+  <sql id="tableName">
+	sa_order
+  </sql>
+
+  <!-- 字段 -->
+  <sql id="Field">
+	DEAL_ORDER_ID,
+	PROXY_ID,
+	DEAL_RECORD_NUMBER,
+	MERCHANT_ORDER_NUMBER,
+	DEAL_TYPE,
+	PRODUCT_TYPE,
+	CALCULATE_TIME,
+	ORDER_AMOUNT,
+	DEAL_BRING_SCORE_TYPE,
+	DEAL_BRING_SCORE_RATE,
+	SCORE_RETURN_AMOUNT,
+	USER_AMOUNT,
+	PARTNER_AMOUNT,
+	DEAL_COMMENT,
+	DEAL_STATUS,
+	DEAL_CREATE_TIME,
+	DEAL_END_TIME,
+	USER_ID
+  </sql>
+
+  <sql id="FieldValue">
+  	replace(uuid(),'-',''),
+  	#{proxyId},
+  	#{dealRecordNumber},
+  	#{merchantOrderNumber},
+  	#{dealType},
+  	#{productType},
+  	#{calculateTime},
+  	#{orderAmount},
+  	#{dealBringScoreType},
+  	#{dealBringScoreRate},
+  	#{scoreReturnAmount},
+  	#{userAmount},
+  	#{partnerAmount},
+  	#{dealComment},
+  	#{dealStatus},
+  	#{dealCreateTime},
+  	#{dealEndTime},
+  	#{userId}
+  </sql>
+
+  <insert id="baseInsert" parameterType="org.hlpay.base.model.SaOrder" >
+	insert into
+		<include refid="tableName"></include>
+		(
+			<include refid="Field"></include>
+		)
+		values
+		(
+			<include refid="FieldValue"></include>
+		)
+  </insert>
+
+  <delete id="baseDelete">
+  	delete from <include refid="tableName"></include>
+  	where DEAL_ORDER_ID=#{dealOrderId}
+  </delete>
+
+  <delete id="deleteM" parameterType="org.hlpay.base.model.SaOrder">
+  	delete from <include refid="tableName"></include>
+  	where MERCHANT_ORDER_NUMBER=#{merchantOrderNumber}
+  </delete>
+
+  <select id="baseLimitSelect" resultMap="saOrderMap">
+	select
+		<include refid="Field"></include>
+	from <include refid="tableName"></include>
+	where 1=1
+  </select>
+
+  <select id="baseInfo" resultMap="saOrderMap">
+	select
+		<include refid="Field"></include>
+	from <include refid="tableName"></include>
+	where 1=1 and DEAL_ORDER_ID=#{dealOrderId}
+  </select>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  <insert id="insertSaOrder">
+  	insert into
+  		<include refid="tableName"></include>
+  	(
+  		<include refid="Field"></include>
+  	)
+  	values(
+  		   replace(uuid(),'-',''),#{proxyId},#{dealRecordNumber},#{merchantOrderNumber},
+  		   #{dealType},#{productType},#{calculateTime},#{orderAmount},#{dealBringScoreType},
+  		   #{dealBringScoreRate},#{scoreReturnAmount},
+  		   #{dealComment},#{dealStatus},now(),#{dealEndTime},#{userId},#{cardNumber}
+  		   )
+  </insert>
+
+  <delete id="deleteSaOrder" parameterType="String">
+  	update
+  		<include refid="tableName"></include>
+  	set
+  		IS_DELETE=1
+  	where DEAL_ORDER_ID = #{dealOrderId}
+  </delete>
+
+  <update id="updateSaOrder">
+  	update
+  		<include refid="tableName"></include>
+  	set
+  		<if test="status != null and status != ''">
+  			STATUS=#{status},
+  		</if>
+  		DEAL_ORDER_ID = DEAL_ORDER_ID
+  	where DEAL_ORDER_ID = #{dealOrderId}
+  </update>
+
+  <update id="update">
+		update
+	        <include refid="tableName"></include>
+	    set
+	    	DEAL_STATUS=1,DEAL_END_TIME=now()
+  	where USER_ID in
+  	<foreach item="item" index="key" collection="maps"
+            open="(" separator="," close=")">
+	    #{key}
+    </foreach>
+     and ISNULL(DEAL_END_TIME)
+  </update>
+
+  <select id="selectSaOrder" resultMap="saOrderMap">
+  	select
+  		*
+  	from <include refid="tableName"></include>
+  	where IS_DELETE!=1 and USER_ID=#{userId} order by DEAL_CREATE_TIME desc
+  </select>
+
+   <select id="infoSaOrder" parameterType="String" resultMap="saOrderMap">
+  	select
+  		*
+  	from <include refid="tableName"></include>
+  	<where>
+		<if test="dealOrderId != null and dealOrderId != ''">
+			DEAL_ORDER_ID = #{dealOrderId} and IS_DELETE!=1
+		</if>
+  	</where>
+  </select>
+
+</mapper>

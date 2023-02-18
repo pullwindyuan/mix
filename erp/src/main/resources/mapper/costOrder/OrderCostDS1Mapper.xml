@@ -1,0 +1,117 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.futuremap.erp.module.orderCost.mapper.OrderCostDS1Mapper">
+    <resultMap id="orderCost" type="com.futuremap.erp.module.orderCost.entity.OrderCost"/>
+
+    <update id="updateOwnd"  parameterType="java.util.Map">
+        UPDATE order_cost SET order_type=#{orderType} WHERE company_label=#{companyLabel} AND dmonth=#{dmonth} AND ccus_code IN
+        <foreach collection="excompany" item="item" index="index" open="(" close=")" separator=",">
+            #{item}
+        </foreach>
+    </update>
+
+    <sql id="findList_where">
+        <where>
+            order_type!=3
+            <if test="orderCostQuery.ccusCode !=null">
+                and a.ccus_code = #{orderCostQuery.ccusCode}
+            </if>
+            <if test="orderCostQuery.cpersonCode !=null">
+                and a.cperson_code = #{orderCostQuery.cpersonCode}
+            </if>
+            <if test="orderCostQuery.orderNumber !=null">
+                and a.order_number = #{orderCostQuery.orderNumber}
+            </if>
+            <if test="orderCostQuery.cinvcode !=null">
+                and a.cinvcode = #{orderCostQuery.cinvcode}
+            </if>
+            <if test="orderCostQuery.cvenCode !=null">
+                and a.cven_code like CONCAT("%",#{orderCostQuery.cvenCode},"%")
+            </if>
+
+            <if test="orderCostQuery.companyCode !=null">
+                and a.company_code = #{orderCostQuery.companyCode}
+            </if>
+            <if test="orderCostQuery.dmonth !=null">
+                and a.dmonth = #{orderCostQuery.dmonth}
+            </if>
+            <if test="orderCostQuery.orderDetailCode !=null">
+                and a.order_detail_code = #{orderCostQuery.orderDetailCode}
+            </if>
+            <if test="orderCostQuery.companyLabel !=null">
+                and a.company_label = #{orderCostQuery.companyLabel}
+            </if>
+
+            <if test="orderCostQuery.income1 !=null and orderCostQuery.income2 !=null">
+                and a.income &gt;= #{orderCostQuery.income1} and a.income &lt;=#{orderCostQuery.income2}
+            </if>
+
+            <if test="orderCostQuery.income1 !=null and orderCostQuery.income2 ==null">
+                and a.income &gt;= #{orderCostQuery.income1}
+            </if>
+            <if test="orderCostQuery.income1 ==null and orderCostQuery.income2 !=null">
+                and a.income &lt;=#{orderCostQuery.income2}
+            </if>
+
+
+            <if test="orderCostQuery.costSum1 !=null and orderCostQuery.costSum2 !=null">
+                and a.cost_sum &gt;= #{orderCostQuery.costSum1} and a.cost_sum &lt;=#{orderCostQuery.costSum2}
+            </if>
+            <if test="orderCostQuery.costSum1 !=null and orderCostQuery.costSum2 ==null">
+                and a.cost_sum &gt;= #{orderCostQuery.costSum1}
+            </if>
+            <if test="orderCostQuery.costSum1 ==null and orderCostQuery.costSum2 !=null">
+                and a.cost_sum &lt;=#{orderCostQuery.costSum2}
+            </if>
+
+
+            <if test="orderCostQuery.profitSumRadio1 !=null and orderCostQuery.profitSumRadio2 !=null">
+                and a.profit_sum_radio &gt;= #{orderCostQuery.profitSumRadio1} and a.profit_sum_radio &lt;=#{orderCostQuery.profitSumRadio2}
+            </if>
+            <if test="orderCostQuery.profitSumRadio1 !=null and orderCostQuery.profitSumRadio2 ==null">
+                and a.profit_sum_radio &gt;= #{orderCostQuery.profitSumRadio1}
+            </if>
+            <if test="orderCostQuery.profitSumRadio1 ==null and orderCostQuery.profitSumRadio2 !=null">
+                and a.profit_sum_radio &lt;=#{orderCostQuery.profitSumRadio2}
+            </if>
+
+
+            <if test="orderCostQuery.costTotal1 !=null and orderCostQuery.costTotal2 !=null">
+                and a.cost_total &gt;= #{orderCostQuery.costTotal1} and a.cost_total &lt;=#{orderCostQuery.costTotal2}
+            </if>
+            <if test="orderCostQuery.costTotal1 !=null and orderCostQuery.costTotal2 ==null">
+                and a.cost_total &gt;= #{orderCostQuery.costTotal1}
+            </if>
+            <if test="orderCostQuery.costTotal1 ==null and orderCostQuery.costTotal2 !=null">
+                and a.cost_total &lt;=#{orderCostQuery.costTotal2}
+            </if>
+
+
+            <if test="orderCostQuery.profitRadio1 !=null and orderCostQuery.profitRadio2 !=null">
+                and a.profit_radio &gt;= #{orderCostQuery.profitRadio1} and a.profit_radio &lt;=#{orderCostQuery.profitRadio2}
+            </if>
+            <if test="orderCostQuery.profitRadio1 !=null and orderCostQuery.profitRadio2 ==null">
+                and a.profit_radio &gt;= #{orderCostQuery.profitRadio1}
+            </if>
+            <if test="orderCostQuery.profitRadio1 ==null and orderCostQuery.profitRadio2 !=null">
+                and a.profit_radio &lt;=#{orderCostQuery.profitRadio2}
+            </if>
+
+        </where>
+    </sql>
+
+    <select id="findList" resultMap="orderCost"
+            parameterType="com.futuremap.erp.module.orderCost.entity.OrderCostQuery">
+        select ${orderCostQuery.columnVisit} from order_cost a
+        <include refid="findList_where"/>
+        order by a.create_time desc
+    </select>
+    <select id="findLists" resultMap="orderCost"
+            parameterType="com.futuremap.erp.module.orderCost.entity.OrderCostQuery">
+        select * from order_cost a
+        <include refid="findList_where"/>
+        order by a.create_time desc
+    </select>
+
+
+</mapper>

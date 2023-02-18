@@ -1,0 +1,501 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.futuremap.erp.module.orderCost.mapper.OrderCostDS2Mapper">
+    <resultMap id="orderCost" type="com.futuremap.erp.module.orderCost.entity.OrderCost"/>
+    <resultMap id="cven" type="com.futuremap.erp.module.orderCost.entity.Cven"/>
+
+    <select id="getOrderAndIncomeList" resultMap="orderCost" parameterType="string">
+        SELECT
+        autoid,
+        csbvcode as invoiceId,
+        cdemandcode as orderDetailCode,
+        iorderrowno AS orderNumber,
+        irowno,
+        iquantity as fquantity,
+        cinvcode,
+        cinvname,
+        cdepname,
+        dverifysystime,
+        dcreatesystime,
+        dArverifydate as darverifierdate,
+        ccusCode,
+        ccusName,
+        dArverifydate as dmonth
+        FROM SaleBillVouchZT inner join SaleBillVouchZW on SaleBillVouchZT.sbvid=SaleBillVouchZW.sbvid
+        WHERE cdemandcode is not null and (cVouchType = 26 OR cVouchType = 27) AND ( 1 = 1 AND ((dArverifydate &gt;= #{startDate}) AND (dArverifydate &lt;=
+        #{endDate}))) ;
+    </select>
+
+    <select id="getOrderAndIncomeList3" resultMap="orderCost" parameterType="string">
+        SELECT
+        autoid,
+        csbvcode as invoiceId,
+        cdemandcode as orderDetailCode,
+        iorderrowno AS orderNumber,
+        irowno,
+        iquantity as fquantity,
+        cinvcode,
+        cinvname,
+        iNatMoney as income,
+        dverifysystime,
+        dcreatesystime,
+        dArverifydate as darverifierdate,
+        cdepname,
+        ccusCode,
+        ccusName,
+        dArverifydate as dmonth
+        FROM SaleBillVouchZT inner join SaleBillVouchZW on SaleBillVouchZT.sbvid=SaleBillVouchZW.sbvid
+        WHERE cdemandcode is not null and (cVouchType = 26 OR cVouchType = 27) AND ( 1 = 1 AND ((dArverifydate &gt;= #{startDate}) AND (dArverifydate &lt;=
+        #{endDate}))) ;
+    </select>
+
+    <select id="getOCbyType1" resultMap="orderCost" parameterType="string">
+        select b.AutoID, b.iNatMoney as income,b.cparentCode,b.cchildCode,b.cordercode as orderDetailCode,b.irowno,b.iorderrowno as orderNumber,b.cInvCode as cinvCode
+        from SaleBillVouch as a inner join SaleBillVouchs as b on a.SBVID=b.SBVID
+        where a.dArverifydate &gt;= #{startDate} and a.dArverifydate  &lt;=  #{endDate} and b.cParentCode is not null;
+    </select>
+    <select id="getOCbyType2" resultMap="orderCost" parameterType="string">
+        select b.AutoID,  b.iNatMoney as income,b.cparentCode,b.cchildCode,b.cordercode as orderDetailCode,b.irowno,b.iorderrowno as orderNumber,b.cInvCode as cinvCode
+        from SaleBillVouch as a inner join SaleBillVouchs as b on a.SBVID=b.SBVID
+        where a.dArverifydate &gt;= #{startDate} and a.dArverifydate  &lt;=  #{endDate} and b.cchildCode is not null;
+    </select>
+
+
+    <select id="getOrderAndIncomeList2" resultMap="orderCost" parameterType="string">
+
+        SELECT
+        a.irowno AS orderNumber,
+        a.inatunitprice as taxPrice,
+        a.iquantity as fquantity,
+        a.cinvcode,
+        a.cordercode as orderDetailCode
+
+        FROM
+        SaleOrderSQ as a
+        right join (SELECT
+        distinct(SaleOrderQ.id) as soi
+        FROM
+        SaleOrderQ
+        LEFT JOIN (SELECT id AS kkid FROM so_somain_extradefine) sse ON kkid = saleorderq.id
+        INNER JOIN SaleOrderSQ  ON SaleOrderQ.id = SaleOrderSQ.id
+        LEFT JOIN (SELECT isosid AS kbsei FROM so_sodetails_extradefine) ssef ON kbsei = saleordersq.isosid
+        WHERE cSOCode in (
+        SELECT
+        distinct(SaleBillVouchZW.csocode) AS orderDetailCode
+        FROM
+        SaleBillVouchZT
+        INNER JOIN SaleBillVouchZW ON SaleBillVouchZT.sbvid = SaleBillVouchZW.sbvid
+        WHERE (cVouchType = 26 OR cVouchType = 27)
+        AND (ddate  &gt;= #{startDate}) AND (ddate  &lt;= #{endDate})
+        AND ISNULL (cchildcode, '') = ''
+
+        )) as b on a.id=b.soi
+
+
+
+    </select>
+    <select id="getOrderAndIncomeList0" resultMap="orderCost" parameterType="string">
+        SELECT
+        autoid,
+        csbvcode as invoiceId,
+        SaleBillVouchZW.csocode as orderDetailCode,
+        SaleBillVouchZW.iorderrowno AS orderNumber,
+        iquantity as fquantity,
+        cinvcode,
+        cinvname,
+        irowno,
+        dverifysystime,
+        dcreatesystime,
+        dArverifydate as darverifierdate,
+        cdepname,
+        ccusCode,
+        ccusName,
+        dArverifydate as dmonth
+        FROM SaleBillVouchZT inner join SaleBillVouchZW on SaleBillVouchZT.sbvid=SaleBillVouchZW.sbvid
+        WHERE SaleBillVouchZW.csocode  is not null and  (cVouchType = 26 OR cVouchType = 27) AND ( 1 = 1 AND ((dArverifydate &gt;= #{startDate}) AND (dArverifydate &lt;=
+        #{endDate}))) ;
+    </select>
+
+    <select id="getOrderAndIncomeList1" resultMap="orderCost" parameterType="string">
+        SELECT
+        SaleBillVouchZW.csocode as orderDetailCode,
+        SaleBillVouchZW.iorderrowno AS orderNumber,
+        iquantity as fquantity,
+        cinvcode,
+        ddate as dmonth
+        FROM SaleBillVouchZT inner join SaleBillVouchZW on SaleBillVouchZT.sbvid=SaleBillVouchZW.sbvid
+        WHERE (cVouchType = 26 OR cVouchType = 27) AND ( 1 = 1 AND ((ddate &gt;= #{startDate}) AND (ddate &lt;=
+        #{endDate}))) AND ISNULL (cchildcode, '') = '';
+    </select>
+
+
+    <select id="getOrderCodeList" resultMap="orderCost" parameterType="string">
+        SELECT
+        autoid,
+        ccode as invoiceId,
+        idemandseq AS orderNumber,
+        irowno,
+        cdemandcode AS orderDetailCode,
+        cinvcode,
+        cinvname,
+        cdepname,
+        fquantity,
+        dverifysystime,
+        dcreatesystime,
+        darverifierdate,
+        ccusCode,
+        darverifierdate as dmonth
+        FROM v_ex_invoicelist
+        WHERE
+        iverifystate=2 and fquantity>0 and cdemandcode is not null AND darverifierdate &gt;= #{startDate} AND darverifierdate &lt;= #{endDate}
+    </select>
+
+    <select id="getMaterialCost" resultType="java.math.BigDecimal" parameterType="string">
+
+        select iTaxPrice as materialCost from PO_Podetails where csocode = #{orderCode} AND irowno=#{orderNumber} and
+        cinvcode=#{cinvcode}
+    </select>
+
+
+
+    <select id="getDeliverDay" resultType="java.lang.String" parameterType="string">
+        SELECT
+        top 1
+        dverifydate
+        FROM
+        Sales_FHD_T
+        INNER JOIN Sales_FHD_W
+        ON Sales_FHD_T.dlid = Sales_FHD_W.dlid
+        LEFT JOIN
+        (SELECT
+        chdefine1 AS chdefine1,
+        dlid AS keyextend_t_dlid_dispatchlist_extradefine_dlid
+        FROM
+        dispatchlist_extradefine) extend_t_dlid_dispatchlist_extradefine
+        ON keyextend_t_dlid_dispatchlist_extradefine_dlid = sales_fhd_t.dlid
+        WHERE
+        ISNULL (cchildcode, '') = ''
+        AND ISNULL (cchildcode, '') = ''
+        and Sales_FHD_T.csocode=#{orderDetilCode} and cinvcode=#{cInvCode} and idemandseq=#{orderNumber} and ccuscode=#{customerCode}
+    </select>
+    <select id="getDeliverDay_erp10" resultType="java.lang.String" parameterType="string">
+        SELECT
+        top 1
+        dverifydate
+        FROM
+        Sales_FHD_T
+        INNER JOIN Sales_FHD_W
+        ON Sales_FHD_T.dlid = Sales_FHD_W.dlid
+        LEFT JOIN
+        (SELECT
+
+        idlsid AS keyextend_b_idlsid_dispatchlists_extradefine_idlsid
+        FROM
+        dispatchlists_extradefine) extend_b_idlsid_dispatchlists_extradefine
+        ON keyextend_b_idlsid_dispatchlists_extradefine_idlsid = sales_fhd_w.idlsid
+        LEFT JOIN
+        (SELECT
+        cidefine1 AS extend_b_cinvcode_v_inventory_cidefine1,
+        cinvdefine2 AS extend_b_cinvcode_v_inventory_cinvdefine2,
+        iinvweight AS extend_b_cinvcode_v_inventory_iinvweight,
+        fgrossw AS extend_b_cinvcode_v_inventory_fgrossw,
+        cinvcode AS keyextend_b_cinvcode_v_inventory_cinvcode
+        FROM
+        v_inventory) extend_b_cinvcode_v_inventory
+        ON keyextend_b_cinvcode_v_inventory_cinvcode = sales_fhd_w.cinvcode
+        WHERE
+        ISNULL (cchildcode, '') = ''
+        AND ISNULL (cchildcode, '') = ''
+        and Sales_FHD_T.csocode=#{orderDetilCode} and cinvcode=#{cInvCode} and idemandseq=#{orderNumber} and ccuscode=#{customerCode}
+    </select>
+    <select id="getDeliverDay_all" resultType="java.lang.String" parameterType="string">
+        select
+            top 1 a.dnverifytime
+        from
+            rdrecord32 as a inner join rdrecords32 as b on a.ID=b.ID inner join ex_invoicedetail as c on b.csocode =c.cdemandcode and b.isoseq =c.irowno inner join  ex_invoice  as d on c.ID=d.ID
+        where
+        d.ccode = #{invoiceId}
+        and c.cdemandcode=#{orderDetailCode}
+        and c.idemandseq =#{orderNumber}
+        and b.cInvCode=#{productCode}
+    </select>
+    <select id="getDeliverDay_erp3" resultType="java.lang.String" parameterType="string">
+        SELECT
+        top 1
+        dverifydate
+        FROM
+        Sales_FHD_T
+        INNER JOIN Sales_FHD_W
+        ON Sales_FHD_T.dlid = Sales_FHD_W.dlid
+        WHERE
+        ISNULL (cchildcode, '') = ''
+        AND ISNULL (cchildcode, '') = ''
+        and cinvcode=#{cInvCode} and idemandseq=#{orderNumber} and ccuscode=#{customerCode}
+    </select>
+    <select id="getReturnDay" resultType="java.lang.String" parameterType="string">
+        select max(dVouchDate) as dvd from AR_CloseList where cVouchID
+            in(
+                SELECT
+                    distinct(cVouchID)
+                FROM
+                    Ar_DetailCust_V a
+                    WHERE (iflag  &lt;= 2 OR iflag = 5)
+                    AND cCoVouchType != cProcStyle
+                    AND iFlag != 1
+                    AND cProcStyle != '9C'
+                    AND cProcStyle != '9M'
+                    AND cProcStyle != 'TP'
+                    AND (cProcStyle != 'XJ' OR iFlag = 5)
+                    AND ((cProcStyle = 'BZ'AND ((cSign = 'Z'AND iDAmount  &lt; 0) OR (cSign = 'F' AND iDAmount &gt; 0))) OR cProcStyle != 'BZ')
+                    AND ( cFlag = 'AR'OR a.cBusType = '代理进口')
+                    AND cCoVouchID=#{invoiceId}
+                    AND cCoVouchID != cVouchID
+        )
+    </select>
+
+
+
+
+
+
+
+    <select id="getMaterialCost_0" resultType="java.math.BigDecimal" parameterType="string">
+
+        SELECT
+        sum(imoney) as mn
+        FROM
+        zpurpoheader WITH (nolock)
+        INNER JOIN zpurpotail WITH (nolock)
+        ON zpurpoheader.poid = zpurpotail.poid
+        LEFT JOIN
+        (SELECT
+        chdefine1 AS chdefine1,
+        poid AS keyextend_t_poid_po_pomain_extradefine_poid
+        FROM
+        po_pomain_extradefine) extend_t_poid_po_pomain_extradefine
+        ON keyextend_t_poid_po_pomain_extradefine_poid = zpurpoheader.poid
+        where csocode = #{orderCode} AND irowno=#{orderNumber} and
+        cinvcode=#{cinvcode}
+    </select>
+
+    <select id="getMaterialCost_1" resultType="java.math.BigDecimal" parameterType="string">
+        SELECT
+        sum(inatunitprice) as mn
+        FROM
+        zpurpoheader WITH (nolock)
+        INNER JOIN zpurpotail WITH (nolock)
+        ON zpurpoheader.poid = zpurpotail.poid
+        where csocode = #{orderCode} AND irowno=#{orderNumber} and
+        cinvcode=#{cinvcode}
+    </select>
+
+    <select id="getMaterialCost_Hexiao" resultType="java.math.BigDecimal" parameterType="string">
+        SELECT sum(iprice)/sum(iquantity) FROM om_mshead INNER JOIN om_msbody ON om_mshead.msid = om_msbody.msid
+        WHERE cmocode=
+        (
+        SELECT top 1 ccode FROM om_mohead INNER JOIN om_mobody ON om_mohead.moid = om_mobody.moid
+        WHERE csocode=#{orderCode} and irowno=#{orderNumber} and cinvcode=#{cinvcode} and iProductType = 0
+        )
+        and cinvcode=#{cinvcode}
+    </select>
+    <select id="getMaterialCost_HexiaoX" resultType="java.math.BigDecimal" parameterType="string">
+        SELECT sum(iprice)/sum(iquantity) FROM om_mshead INNER JOIN om_msbody ON om_mshead.msid = om_msbody.msid
+        WHERE cmocode=
+        (
+        SELECT top 1 ccode FROM om_mohead INNER JOIN om_mobody ON om_mohead.moid = om_mobody.moid
+        WHERE csocode=#{orderCode}  and cinvcode=#{cinvcode} and iProductType = 0
+        )
+        and cinvcode=#{cinvcode}
+    </select>
+
+    <select id="getMaterialCost_1X" resultType="java.math.BigDecimal" parameterType="string">
+        SELECT
+        sum(inatunitprice) as mn
+        FROM
+        zpurpoheader WITH (nolock)
+        INNER JOIN zpurpotail WITH (nolock)
+        ON zpurpoheader.poid = zpurpotail.poid
+        where csocode = #{orderCode} and
+        cinvcode=#{cinvcode}
+    </select>
+    <select id="getMaterialCost_1000" resultType="java.math.BigDecimal" parameterType="string">
+        SELECT
+        top 1
+        inatunitprice as mn
+        FROM
+        zpurpoheader WITH (nolock)
+        INNER JOIN zpurpotail WITH (nolock)
+        ON zpurpoheader.poid = zpurpotail.poid
+        where
+        cinvcode=#{cinvcode}
+    </select>
+    <select id="getMaterialCost_1001" resultType="Map" parameterType="string">
+        select csocode, iNatUnitPrice  from PO_Pomain as a
+        inner join PO_Podetails as b on a.POID=b.POID
+        where csocode  = #{orderCode}  and irowno=#{orderNumber} and cinvcode = #{cinvcode}
+    </select>
+    <select id="getMaterialCost_1001X" resultType="Map" parameterType="string">
+        select csocode, iNatUnitPrice  from PO_Pomain as a
+        inner join PO_Podetails as b on a.POID=b.POID
+        where csocode  = #{orderCode}   and cinvcode = #{cinvcode}
+    </select>
+
+    <select id="getMaterialCost_0001" resultType="java.math.BigDecimal" parameterType="string">
+        SELECT
+        sum(inatunitprice) as mn
+        FROM
+        zpurpoheader WITH (nolock)
+        INNER JOIN zpurpotail WITH (nolock)
+        ON zpurpoheader.poid = zpurpotail.poid
+        where csocode = #{orderCode} AND
+        cinvcode=#{cinvcode}
+    </select>
+    <select id="getMaterialCost_0002" resultType="java.math.BigDecimal" parameterType="string">
+        SELECT
+        sum(inatunitprice) as mn
+        FROM
+        zpurpoheader WITH (nolock)
+        INNER JOIN zpurpotail WITH (nolock)
+        ON zpurpoheader.poid = zpurpotail.poid
+        where csocode like #{orderCode} AND
+        cinvcode=#{cinvcode}
+    </select>
+
+    <select id="getMaterialCost_2" resultType="Map" parameterType="string">
+        SELECT
+        sum(inatunitprice) as matericalCost_unit,
+        csocode as orderDetailCode
+        FROM
+        zpurpoheader
+        INNER JOIN zpurpotail
+        ON zpurpoheader.poid = zpurpotail.poid
+        where csocode like #{orderCode} AND irowno=#{orderNumber} and
+        cinvcode=#{cinvcode} group by csocode
+    </select>
+
+    <select id="getCvenList" resultMap="cven" parameterType="string">
+        SELECT
+        cvencode,cvenname
+        FROM
+        zpurpoheader
+        INNER JOIN zpurpotail
+        ON zpurpoheader.poid = zpurpotail.poid
+        where csocode = #{orderCode} AND irowno=#{orderNumber}  group by cvencode,cvenname
+    </select>
+
+    <select id="getCvenListLike" resultMap="cven" parameterType="string">
+        SELECT
+        cvencode,cvenname
+        FROM
+        zpurpoheader
+        INNER JOIN zpurpotail
+        ON zpurpoheader.poid = zpurpotail.poid
+        where csocode like #{orderCode} AND irowno=#{orderNumber}  group by cvencode,cvenname
+    </select>
+
+
+
+
+
+    <select id="getBomLists" resultType="com.futuremap.erp.module.orderCost.entity.Bom" parameterType="java.util.Map">
+        select a.BomId, b.InvCode,a.BaseQtyN from bom_opcomponent a inner join bas_part b on a.ComponentId=b.PartId where a.bomid in
+        <foreach collection="bomids" item="item" index="index" open="(" close=")" separator=",">
+            #{item}
+        </foreach>
+
+    </select>
+
+
+    <select id="getExport_amount" resultType="java.math.BigDecimal" parameterType="java.util.Map">
+        select sum(b.fnatmoney) AS exportAmount from ex_invoice as a inner join ex_invoicedetail as b on a.id = b.id  where  a.darverifierdate &gt;= #{startDate} and a.darverifierdate  &lt;= #{endDate}
+        AND a.ccuscode NOT IN
+        <foreach collection="excompany" item="item" index="index" open="(" close=")" separator=",">
+            #{item}
+        </foreach>
+
+    </select>
+
+
+    <select id="getDomestic_amount2" resultType="java.math.BigDecimal" parameterType="java.util.Map">
+        select SUM(b.iNatMoney)  AS domesticAmount  from SaleBillVouch as a inner join SaleBillVouchs as b on a.SBVID=b.SBVID  where  a.dArverifydate &gt;= #{startDate}  and  A.dArverifydate &lt;= #{endDate}
+        and a.cCusCode not in
+        <foreach collection="excompany" item="item" index="index" open="(" close=")" separator=",">
+            #{item}
+        </foreach>
+    </select>
+
+
+
+    <select id="getMaterialCost_4" resultType="java.math.BigDecimal" parameterType="string">
+        select sum(t1.iFinAmo/W.iQua) as mc from Ca_AmoctRevert as t1
+        left join ca_comps W on t1.cppid=W.cppid and t1.cbatch=W.cbatch and t1.iperiod=W.iperiod
+        inner join ca_batchmap t3
+        on t1.cppid=t3.irealcoid and t1.cbatch = t3.cbatch where W.iQua!=0 AND cMOCode = #{orderCode} AND iMOSubSN = #{orderNumber} and
+        t1.cAmoType = #{cAmoType}
+    </select>
+
+    <select id="getItemCostByType" resultType="java.math.BigDecimal" parameterType="string">
+        select sum(t1.iFinAmo/W.iQua) as mc from Ca_AmoctRevert as t1
+        left join ca_comps W on t1.cppid=W.cppid and t1.cbatch=W.cbatch and t1.iperiod=W.iperiod
+        inner join ca_batchmap t3
+        on t1.cppid=t3.irealcoid and t1.cbatch = t3.cbatch where W.iQua!=0 AND cMOCode = #{orderCode} AND iMOSubSN = #{orderNumber} and
+        t1.cAmoType = #{cAmoType} and  t1.iPeriod=#{dmonth}
+    </select>
+
+    <select id="getItemCostByType0001" resultType="java.math.BigDecimal" parameterType="string">
+        select top 1 sum(t1.iFinAmo/W.iQua) as mc from Ca_AmoctRevert as t1
+        left join ca_comps W on t1.cppid=W.cppid and t1.cbatch=W.cbatch and t1.iperiod=W.iperiod
+        inner join ca_batchmap t3
+        on t1.cppid=t3.irealcoid and t1.cbatch = t3.cbatch where W.iQua!=0 AND cMOCode = #{orderCode} AND iMOSubSN = #{orderNumber} and
+        t1.cAmoType = #{cAmoType} and t1.iPeriod &lt;=#{dmonth}  group by t1.iPeriod order by t1.iPeriod desc
+    </select>
+
+    <select id="getManufactureCostByItem" resultType="java.math.BigDecimal" parameterType="string">
+        select sum(t1.iFinAmo/t1.iFinOutPut) from Ca_AmoctRevert as t1
+        left join ca_comps W on t1.cppid=W.cppid and t1.cbatch=W.cbatch and t1.iperiod=W.iperiod
+        inner join ca_batchmap t3
+        on t1.cppid=t3.irealcoid and t1.cbatch = t3.cbatch
+        where cMOCode = #{orderCode} AND iMOSubSN = #{orderNumber}   and t1.cAmoType = #{cAmoType}  and w.iQua!=0 and t1.iperiod = #{dmonth};
+    </select>
+
+    <select id="getManufactureCostByItem0001" resultType="java.math.BigDecimal" parameterType="string">
+        select sum(t1.iFinAmo/t1.iFinOutPut) from Ca_AmoctRevert as t1
+        left join ca_comps W on t1.cppid=W.cppid and t1.cbatch=W.cbatch and t1.iperiod=W.iperiod
+        inner join ca_batchmap t3
+        on t1.cppid=t3.irealcoid and t1.cbatch = t3.cbatch
+        where cMOCode = #{orderCode} AND iMOSubSN = #{orderNumber}   and t1.cAmoType = #{cAmoType}  and w.iQua!=0
+    </select>
+
+    <select id="getBomId" resultType="java.lang.String" parameterType="string">
+        select top 1 a.BomId from bom_bom A
+        inner join  bom_parent B on A.BomId = B.BomId
+        inner join  bas_part C on B.ParentId = C.PartId
+        inner join  inventory D on C.InvCode = D.cInvCode
+        left join ComputationUnit e on d.cComUnitCode = e.cComUnitCode
+        WHERE  c.InvCode=#{cinvcode} and VersionDesc='订单BOM'
+    </select>
+
+    <select id="getOrderIncome_Co10" resultType="java.math.BigDecimal" parameterType="string">
+        SELECT
+        sum(inatmoney) as im
+        FROM
+        SaleBillVouchZT
+        INNER JOIN SaleBillVouchZW
+        ON SaleBillVouchZT.sbvid = SaleBillVouchZW.sbvid
+        WHERE (cVouchType = 26 OR cVouchType = 27) and csbvcode=#{csbvcode} and cinvcode=#{cinvcode}
+        and SaleBillVouchZW.csocode=#{cordercode} and irowno=#{irowno} and iorderrowno=#{iorderrowno} and autoid=#{autoid}
+
+    </select>
+    <select id="getOrderIncome_Co10_1" resultType="java.math.BigDecimal" parameterType="string">
+        SELECT
+        sum(inatmoney) as im
+        FROM
+        SaleBillVouchZT
+        INNER JOIN SaleBillVouchZW
+        ON SaleBillVouchZT.sbvid = SaleBillVouchZW.sbvid
+        WHERE autoid=#{autoid} and (cVouchType = 26 OR cVouchType = 27) and csbvcode=#{csbvcode} and cinvcode=#{cinvcode}  and SaleBillVouchZW.csocode=#{cordercode}  and iorderrowno=#{iorderrowno} and irowno is null
+
+    </select>
+
+
+</mapper>

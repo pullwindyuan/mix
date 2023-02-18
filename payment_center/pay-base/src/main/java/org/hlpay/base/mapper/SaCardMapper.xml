@@ -1,0 +1,964 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="org.hlpay.base.mapper.SaCardMapper" >
+  <resultMap id="saCardMap" type="org.hlpay.base.model.SaCard" >
+	  <id column="CARD_ID" jdbcType="VARCHAR" property="cardId" />
+	  <result column="CARD_NUMBER" jdbcType="VARCHAR" property="cardNumber" />
+	  <result column="CARD_TYPE" jdbcType="VARCHAR" property="cardType" />
+	  <result column="CARD_NAME" jdbcType="VARCHAR" property="cardName" />
+	  <result column="CONFIG_NUMBER" jdbcType="VARCHAR" property="configNumber" />
+	  <result column="LOGIN_ACCOUNT" jdbcType="VARCHAR" property="loginAccount" />
+	  <result column="REMAIN_PART" jdbcType="BIGINT" property="remainPart" />
+	  <result column="FREEZE_PART" jdbcType="BIGINT" property="freezePart" />
+	  <result column="NOT_BILL" jdbcType="BIGINT" property="notBill" />
+	  <result column="CARD_STATUS" jdbcType="CHAR" property="cardStatus" />
+	  <result column="CARD_LIMIT" jdbcType="BIGINT" property="cardLimit" />
+	  <result column="CREATE_TIME" jdbcType="TIMESTAMP" property="createTime" />
+	  <result column="USER_NAME" jdbcType="VARCHAR" property="userName" />
+	  <result column="USER_ID" jdbcType="VARCHAR" property="userId" />
+	  <result column="IS_DELETE" jdbcType="CHAR" property="isDelete" />
+	  <result column="FLAG" jdbcType="INTEGER" property="flag" />
+	  <result column="EXP_SUM" jdbcType="BIGINT" property="expSum" />
+	  <result column="RECHARGE_SUM" jdbcType="BIGINT" property="rechargeSum" />
+	  <result column="AWARD_SUM" jdbcType="BIGINT" property="awardSum" />
+	  <result column="UPDATE_TIME" jdbcType="TIMESTAMP" property="updateTime" />
+	  <result column="CURRENCY" jdbcType="VARCHAR" property="currency" />
+	  <result column="VALID_START_TIME" jdbcType="TIMESTAMP" property="validStartTime" />
+	  <result column="VALID_END_TIME" jdbcType="TIMESTAMP" property="validEndTime" />
+	  <result column="YEAR_MONTH_GROUP" jdbcType="BIGINT" property="yearMonthGroup" />
+	  <result column="YEAR_GROUP" jdbcType="BIGINT" property="yearMonthGroup" />
+  </resultMap>
+
+  <!--表名 -->
+  <sql id="tableName">
+	sa_card
+  </sql>
+
+  <!-- 字段 -->
+  <sql id="Field">
+  	CARD_ID,
+	CARD_NUMBER,
+	CARD_TYPE,
+	CURRENCY,
+	VALID_START_TIME,
+	VALID_END_TIME,
+	CONFIG_NUMBER,
+	LOGIN_ACCOUNT,
+	CREATE_TIME,
+	USER_NAME,
+	CARD_NAME,
+	FLAG,
+  <if test="cardLimit != null and cardLimit != ''">
+	  CARD_LIMIT,
+  </if>
+	USER_ID,
+	YEAR_MONTH_GROUP,
+	YEAR_GROUP
+  </sql>
+
+  <sql id="FieldValue">
+  	#{cardId},
+  	#{cardNumber},
+  	#{cardType},
+  	#{currency},
+  	#{validStartTime},
+  	#{validEndTime},
+  	#{configNumber},
+  	#{loginAccount},
+	now(),
+  	#{userName},
+  	#{cardName},
+	#{flag},
+  <if test="cardLimit != null and cardLimit != ''">
+	  #{cardLimit},
+  </if>
+  	#{userId},
+  	#{yearMonthGroup},
+	#{yearGroup}
+  </sql>
+
+  <sql id="selectValue">
+  	CARD_ID,
+	CARD_NUMBER,
+	CARD_TYPE,
+	CURRENCY,
+	VALID_START_TIME,
+	VALID_END_TIME,
+	CARD_NAME,
+	CONFIG_NUMBER,
+	LOGIN_ACCOUNT,
+	DATE_FORMAT(CREATE_TIME,'%Y-%m-%d %T')AS CREATE_TIME,
+	REMAIN_PART,
+	FREEZE_PART,
+	USER_NAME,
+	USER_ID,
+	CASE
+	    WHEN CARD_STATUS='0' THEN '禁用'
+	    WHEN CARD_STATUS='1' THEN '正常'
+    END AS CARD_STATUS
+  </sql>
+
+  <sql id="select_where_clause">
+  	<if test="userId != null">
+  		and USER_ID=#{userId}
+  	</if>
+  	<if test="createTime != null and endTime != null">
+		and CREATE_TIME<![CDATA[ >= ]]>#{createTime} and CREATE_TIME <![CDATA[ <= ]]> #{endTime}
+  	</if>
+  	<if test="loginAccount != null and loginAccount != ''">
+		and LOGIN_ACCOUNT = #{loginAccount}
+  	</if>
+  	<if test="userName != null and userName != ''">
+  		and USER_NAME = #{userName}
+  	</if>
+  	<if test="cardType != null and cardType != ''">
+  		and CARD_TYPE = #{cardType}
+  	</if>
+	<if test="currency != null and currency != ''">
+	  and CURRENCY = #{currency}
+	</if>
+	<if test="validStartTime != null">
+	  and VALID_START_TIME = #{validStartTime}
+	</if>
+	<if test="validEndTime != null">
+	  and VALID_END_TIME = #{validEndTime}
+	</if>
+  	<if test="cardName != null and cardName != ''">
+  		and CARD_NAME = #{cardName}
+  	</if>
+  </sql>
+
+  <insert id="addSaCard">
+  	insert into
+		<include refid="tableName"></include>
+		(
+			CARD_ID,
+			CARD_NUMBER,
+			CARD_TYPE,
+			CURRENCY,
+			VALID_START_TIME,
+	  		VALID_END_TIME,
+			CARD_NAME,
+			CONFIG_NUMBER,
+			LOGIN_ACCOUNT,
+			CREATE_TIME,
+			USER_NAME,
+			USER_ID,
+			FLAG
+		)
+		values
+		<foreach collection="list" item="item" separator=",">
+			#{item.cardId},
+		  	#{item.cardNumber},
+		  	#{item.cardType},
+			#{item.currency},
+			#{item.validStartTime},
+			#{item.validEndTime},
+		  	#{item.cardName},
+		  	#{item.configNumber},
+		  	#{item.loginAccount},
+			now(),
+		  	#{item.userName},
+		  	#{item.userId},
+		  	#{item.flag})
+		</foreach>
+  </insert>
+
+  <insert id="baseInsert" parameterType="org.hlpay.base.model.SaCard" >
+	insert into
+		<include refid="tableName"></include>
+		(
+			<include refid="Field"></include>
+		)
+		values
+		(
+			<include refid="FieldValue"></include>
+		)
+  </insert>
+
+  <update id="updateFreeze" parameterType="org.hlpay.base.model.SaCard">
+  	update <include refid="tableName"></include>
+  	set
+  		<if test="flag == 0">
+  			REMAIN_PART=REMAIN_PART - #{freezePart},
+  			FREEZE_PART=FREEZE_PART + #{freezePart},
+  		</if>
+  		<if test="flag == 1">
+  			REMAIN_PART=REMAIN_PART + #{freezePart},
+  			FREEZE_PART=FREEZE_PART - #{freezePart},
+  		</if>
+  		CARD_ID=CARD_ID
+  	where 1=1
+  		<if test="userId != null and userId != ''">
+  			and USER_ID=#{userId}
+  		</if>
+  		<if test="cardType != null and cardType != ''">
+  			and CARD_TYPE=#{cardType}
+  		</if>
+		<if test="currency != null and currency != ''">
+		  and CURRENCY=#{currency}
+		</if>
+		<if test="validStartTime != null">
+		  and VALID_START_TIME = #{validStartTime}
+		</if>
+		<if test="validEndTime != null">
+		  and VALID_END_TIME = #{validEndTime}
+		</if>
+  		<if test="cardNumber != null and cardNumber != ''">
+  			and CARD_NUMBER= #{cardNumber}
+  		</if>
+  </update>
+
+  <update id="updateData" parameterType="org.hlpay.base.model.SaCard">
+  	update <include refid="tableName"></include>
+  	set
+  		<if test="cardLimit != null and flag == '1'">
+  			CARD_LIMIT=CARD_LIMIT+#{cardLimit},
+  		</if>
+  		<if test="cardLimit != null and flag == '0'">
+  			CARD_LIMIT=CARD_LIMIT-#{cardLimit},
+  		</if>
+  		CARD_ID=CARD_ID
+  		where 1=1
+  		<if test="userId != null and userId != ''">
+  			and USER_ID=#{userId}
+  		</if>
+  		<if test="cardType != null and cardType != ''">
+  			and CARD_TYPE=#{cardType}
+  		</if>
+		<if test="currency != null and currency != ''">
+		  	and CURRENCY=#{currency}
+		</if>
+		<if test="validStartTime != null">
+		  and VALID_START_TIME = #{validStartTime}
+		</if>
+		<if test="validEndTime != null">
+		  and VALID_END_TIME = #{validEndTime}
+		</if>
+  		<if test="cardNumber != null and cardNumber != ''">
+  			and CARD_NUMBER=#{cardNumber}
+  		</if>
+  </update>
+
+   <select id="baseLimitSelect" resultMap="saCardMap">
+		select
+			<include refid="selectValue"></include>
+		from <include refid="tableName"></include>
+		where 1=1
+		<include refid="select_where_clause"></include>
+   </select>
+
+   <update id="updateCard" parameterType="org.hlpay.base.model.SaCard">
+  	update <include refid="tableName"></include>
+  	set
+  		<choose>
+  			<when test="cardNumber == '40006tX6DC6r'">
+  				<if test="freezePart != null and flag == '0'">
+		  			FREEZE_PART=FREEZE_PART-#{freezePart},
+		  		</if>
+		  		<if test="freezePart != null and flag == '1'">
+		  			REMAIN_PART=REMAIN_PART-#{freezePart},
+		  			<!-- FREEZE_PART=FREEZE_PART+#{freezePart}, -->
+		  		</if>
+		  		<if test="freezePart != null and flag == '2'">
+		  			REMAIN_PART=REMAIN_PART+#{freezePart},
+		  			FREEZE_PART=FREEZE_PART-#{freezePart},
+		  		</if>
+  			</when>
+  			<otherwise>
+  				<if test="freezePart != null">
+		  			REMAIN_PART=REMAIN_PART+#{freezePart},
+		  			FREEZE_PART=FREEZE_PART-#{freezePart},
+		  		</if>
+		  		<if test="notBill != null">
+		  			REMAIN_PART=REMAIN_PART+#{notBill},
+		  			NOT_BILL=NOT_BILL-#{notBill},
+		  		</if>
+  			</otherwise>
+  		</choose>
+  		CARD_ID=CARD_ID
+	where CARD_NUMBER=#{cardNumber}
+  </update>
+
+<update id="updateCardList" parameterType="java.util.List">
+	<foreach collection="list" item="item" index="index" open="" close="" separator=";">
+		update <include refid="tableName"></include>
+		set
+			<if test="item.freezePart != null">
+				REMAIN_PART=REMAIN_PART+#{item.freezePart},
+				FREEZE_PART=FREEZE_PART-#{item.freezePart},
+			</if>
+			<if test="item.flag == 1 and item.notBill != null">
+				REMAIN_PART=REMAIN_PART+#{item.notBill},
+				NOT_BILL=NOT_BILL-#{item.notBill},
+			</if>
+			<if test="item.flag == 0 and item.notBill != null">
+				NOT_BILL=NOT_BILL-#{item.notBill},
+			</if>
+			<if test="item.flag == 0 and item.remainPart != null">
+				REMAIN_PART=REMAIN_PART-#{item.remainPart},
+			</if>
+		CARD_ID=CARD_ID
+		where CARD_NUMBER=#{item.cardNumber}
+	</foreach>
+</update>
+
+<update id="doInnerVirtualSettle" parameterType="org.hlpay.base.model.InnerSettleInfo">
+		<foreach collection="innerSettleInfo.saCardList" item="card" index="index" open="" close="">
+			update <include refid="tableName"></include>
+			set
+			<trim suffixOverrides="," >
+				<if test="card.freezePart != null">
+					REMAIN_PART=REMAIN_PART+#{card.freezePart},
+					FREEZE_PART=FREEZE_PART-#{card.freezePart},
+				</if>
+				<if test="card.flag == 1 and card.notBill != null">
+					REMAIN_PART=REMAIN_PART+#{card.notBill},
+					NOT_BILL=NOT_BILL-#{card.notBill},
+				</if>
+				<if test="card.flag == 0 and card.notBill != null">
+					NOT_BILL=NOT_BILL-#{card.notBill},
+				</if>
+				<if test="card.flag == 0 and card.remainPart != null">
+					REMAIN_PART=REMAIN_PART-#{card.remainPart},
+				</if>
+			</trim>
+			where CARD_NUMBER=#{card.cardNumber};
+		</foreach>
+
+		insert into sa_score_flow_real
+		(
+			<!-- 字段 -->
+			SCORE_FLOW_ID,
+			DEAL_RECORD_NUMBER,
+			MERCHANT_ORDER_NUMBER,
+			TRIP_TIME,
+			SCORE_FLOW_NUMBER,
+			SCORE_FLOW_DIRECTION,
+			FLOW_TYPE,
+			CURRENT_DEAL_SCORE,
+			REMAIN_SCORE,
+			ONESELF_ACCOUNT,
+			OTHERS_ACCOUNT,
+			ONESELF_CARD_NUMBER,
+			OTHERS_CARD_NUMBER,
+			PROXY_ID,
+			END_TIME,
+			COMMENT,
+			BILL_NUMBER,
+			USER_ID,
+			CURRENCY,
+			PRODUCT_TYPE,
+			USER_NAME
+		)
+	values
+	<foreach collection="innerSettleInfo.saScoreFlowRealList" item="flow" index="index"  open="" close=";" separator=",">
+		(
+		replace(uuid(),'-',''),
+		#{flow.dealRecordNumber},
+		#{flow.merchantOrderNumber},
+		#{flow.tripTime},
+		#{flow.scoreFlowNumber},
+		#{flow.scoreFlowDirection},
+		#{flow.flowType},
+		#{flow.currentDealScore},
+		#{flow.remainScore},
+		#{flow.oneselfAccount},
+		#{flow.othersAccount},
+		#{flow.oneselfCardNumber},
+		#{flow.othersCardNumber},
+		#{flow.proxyId},
+		#{flow.endTime},
+		#{flow.comment},
+		#{flow.billNumber},
+		#{flow.userId},
+		#{flow.currency},
+		#{flow.productType},
+		#{flow.userName}
+		)
+	</foreach>
+
+	update sa_deal_record set
+	DEAL_STATUS=1,DEAL_END_TIME=now()
+	where PRODUCT_TYPE = #{innerSettleInfo.saDealRecord.productType}
+	and MERCHANT_ORDER_NUMBER = #{innerSettleInfo.saDealRecord.merchantOrderNumber}
+	and REFUND_NUMBER = #{innerSettleInfo.saDealRecord.refundNumber}
+	and DEAL_TYPE = #{innerSettleInfo.saDealRecord.dealType};
+
+	update t_trans_order set
+	Status = #{innerSettleInfo.status,jdbcType=TINYINT},
+	Result = #{innerSettleInfo.result,jdbcType=TINYINT}
+	where TransOrderId = #{innerSettleInfo.saDealRecord.merchantOrderNumber,jdbcType=VARCHAR}
+</update>
+
+<update id="doInnerVirtualSettleToReal" parameterType="org.hlpay.base.model.InnerSettleInfo">
+	<foreach collection="innerSettleInfo.saCardList" item="card" index="index" open="" close="">
+		update <include refid="tableName"></include>
+		set
+		<trim suffixOverrides="," >
+			<if test="card.freezePart != null">
+				REMAIN_PART=REMAIN_PART+#{card.freezePart},
+				FREEZE_PART=FREEZE_PART-#{card.freezePart},
+			</if>
+			<if test="card.flag == 1 and card.notBill != null">
+				REMAIN_PART=REMAIN_PART+#{card.notBill},
+				NOT_BILL=NOT_BILL-#{card.notBill},
+			</if>
+			<if test="card.flag == 0 and card.notBill != null">
+				NOT_BILL=NOT_BILL-#{card.notBill},
+			</if>
+			<if test="card.flag == 0 and card.remainPart != null">
+				REMAIN_PART=REMAIN_PART-#{card.remainPart},
+			</if>
+		</trim>
+		where CARD_NUMBER=#{card.cardNumber};
+	</foreach>
+
+	<foreach collection="innerSettleInfo.saScoreFlowList" item="item" index="index" open="" close=";" separator=";">
+		update sa_score_flow set
+			STATUS=1,
+			REMAIN_SCORE=REMAIN_SCORE+#{item.currentDealScore}<!-- (SELECT MAX(REMAIN_SCORE) from (SELECT * from sa_score_flow)as sa where USER_ID=#{userId}) -->,
+			END_TIME=now()
+		where
+		<choose>
+			<when test="item.scoreFlowId != null and item.scoreFlowId != ''">
+				SCORE_FLOW_ID=#{item.scoreFlowId}
+			</when>
+			<when test="item.scoreFlowNumber != null and item.scoreFlowNumber != ''">
+				SCORE_FLOW_NUMBER=#{item.scoreFlowNumber}
+			</when>
+		</choose>
+	</foreach>
+
+	insert into sa_score_flow_real
+	(
+		<!-- 字段 -->
+		SCORE_FLOW_ID,
+		DEAL_RECORD_NUMBER,
+		MERCHANT_ORDER_NUMBER,
+		TRIP_TIME,
+		SCORE_FLOW_NUMBER,
+		SCORE_FLOW_DIRECTION,
+		FLOW_TYPE,
+		CURRENT_DEAL_SCORE,
+		REMAIN_SCORE,
+		ONESELF_ACCOUNT,
+		OTHERS_ACCOUNT,
+		ONESELF_CARD_NUMBER,
+		OTHERS_CARD_NUMBER,
+		PROXY_ID,
+		END_TIME,
+		COMMENT,
+		BILL_NUMBER,
+		USER_ID,
+		CURRENCY,
+		PRODUCT_TYPE,
+		USER_NAME
+	)
+	values
+	<foreach collection="innerSettleInfo.saScoreFlowRealList" item="flow" index="index"  open="" close=";" separator=",">
+		(
+		replace(uuid(),'-',''),
+		#{flow.dealRecordNumber},
+		#{flow.merchantOrderNumber},
+		#{flow.tripTime},
+		#{flow.scoreFlowNumber},
+		#{flow.scoreFlowDirection},
+		#{flow.flowType},
+		#{flow.currentDealScore},
+		#{flow.remainScore},
+		#{flow.oneselfAccount},
+		#{flow.othersAccount},
+		#{flow.oneselfCardNumber},
+		#{flow.othersCardNumber},
+		#{flow.proxyId},
+		#{flow.endTime},
+		#{flow.comment},
+		#{flow.billNumber},
+		#{flow.userId},
+		#{flow.currency},
+		#{flow.productType},
+		#{flow.userName}
+		)
+	</foreach>
+
+	update sa_deal_record set
+	DEAL_STATUS=1,DEAL_END_TIME=now()
+	where PRODUCT_TYPE = #{innerSettleInfo.saDealRecord.productType}
+	and MERCHANT_ORDER_NUMBER = #{innerSettleInfo.saDealRecord.merchantOrderNumber}
+	and REFUND_NUMBER = #{innerSettleInfo.saDealRecord.refundNumber}
+	and DEAL_TYPE = #{innerSettleInfo.saDealRecord.dealType};
+
+	update t_trans_order set
+		Status = #{innerSettleInfo.status,jdbcType=TINYINT},
+		Result = #{innerSettleInfo.result,jdbcType=TINYINT}
+	where TransOrderId = #{innerSettleInfo.saDealRecord.merchantOrderNumber,jdbcType=VARCHAR}
+</update>
+
+<update id="doInnerScheduleSettle" parameterType="org.hlpay.base.model.InnerSettleInfo">
+		insert into sa_score_flow
+		(
+		<!-- 字段 -->
+		SCORE_FLOW_ID,
+		DEAL_RECORD_NUMBER,
+		MERCHANT_ORDER_NUMBER,
+		TRIP_TIME,
+		SCORE_FLOW_NUMBER,
+		SCORE_FLOW_DIRECTION,
+		FLOW_TYPE,
+		CURRENT_DEAL_SCORE,
+		REMAIN_SCORE,
+		ONESELF_ACCOUNT,
+		OTHERS_ACCOUNT,
+		ONESELF_CARD_NUMBER,
+		OTHERS_CARD_NUMBER,
+		PROXY_ID,
+		END_TIME,
+		COMMENT,
+		BILL_NUMBER,
+		USER_ID,
+		CURRENCY,
+		PRODUCT_TYPE,
+		USER_NAME,
+		FLAG,
+		STATUS
+		)
+		values
+		<foreach collection="innerSettleInfo.saScoreFlowRealList" item="flow" index="index"  open="" close=";" separator=",">
+			(
+			replace(uuid(),'-',''),
+			#{flow.dealRecordNumber},
+			#{flow.merchantOrderNumber},
+			#{flow.tripTime},
+			#{flow.scoreFlowNumber},
+			#{flow.scoreFlowDirection},
+			#{flow.flowType},
+			#{flow.currentDealScore},
+			#{flow.remainScore},
+			#{flow.oneselfAccount},
+			#{flow.othersAccount},
+			#{flow.oneselfCardNumber},
+			#{flow.othersCardNumber},
+			#{flow.proxyId},
+			#{flow.endTime},
+			#{flow.comment},
+			#{flow.billNumber},
+			#{flow.userId},
+			#{flow.currency},
+			#{flow.productType},
+			#{flow.userName},
+			#{flow.flag},
+			IFNULL(#{flow.status},0)
+			)
+		</foreach>
+
+	update sa_deal_record set
+	DEAL_STATUS=1,DEAL_END_TIME=now()
+	where PRODUCT_TYPE = #{innerSettleInfo.saDealRecord.productType}
+	and MERCHANT_ORDER_NUMBER = #{innerSettleInfo.saDealRecord.merchantOrderNumber}
+	and REFUND_NUMBER = #{innerSettleInfo.saDealRecord.refundNumber}
+	and DEAL_TYPE = #{innerSettleInfo.saDealRecord.dealType};
+
+		update t_trans_order set
+		Status = #{innerSettleInfo.status,jdbcType=TINYINT},
+		Result = #{innerSettleInfo.result,jdbcType=TINYINT}
+		where TransOrderId = #{innerSettleInfo.saDealRecord.merchantOrderNumber,jdbcType=VARCHAR}
+	</update>
+
+<update id="doInnerSettle" parameterType="org.hlpay.base.model.InnerSettleInfo">
+	<foreach collection="innerSettleInfo.saCardList" item="card" index="index" open="" close="">
+		update <include refid="tableName"></include>
+		set
+		<trim suffixOverrides="," >
+			<choose>
+				<when test="card.flag == 0 and card.freezePart != null">
+					FREEZE_PART=FREEZE_PART-#{card.freezePart},
+				</when>
+				<when test="card.flag == 1 and card.freezePart != null and card.remainPart == null">
+					FREEZE_PART=FREEZE_PART+#{card.freezePart},
+				</when>
+				<when test="card.flag == 0 and card.remainPart != null">
+					REMAIN_PART=REMAIN_PART-#{card.remainPart},
+				</when>
+				<when test="card.flag == 1 and card.remainPart != null and card.notBill == null and card.freezePart == null">
+					REMAIN_PART=REMAIN_PART+#{card.remainPart},
+				</when>
+				<when test="card.flag == 1 and card.remainPart != null and card.notBill != null and card.freezePart != null">
+					REMAIN_PART=REMAIN_PART+#{card.remainPart},
+					FREEZE_PART=FREEZE_PART+#{card.freezePart},
+					NOT_BILL=NOT_BILL+#{card.notBill},
+				</when>
+				<when test="card.flag == 0 and card.notBill != null">
+					NOT_BILL=NOT_BILL-#{card.notBill},
+				</when>
+				<when test="card.flag == 1 and card.notBill != null and card.remainPart == null">
+					NOT_BILL=NOT_BILL+#{card.notBill},
+				</when>
+			</choose>
+		</trim>
+		where CARD_NUMBER=#{card.cardNumber};
+	</foreach>
+
+	insert into sa_score_flow_real
+	(
+	<!-- 字段 -->
+	   SCORE_FLOW_ID,
+	   DEAL_RECORD_NUMBER,
+	   MERCHANT_ORDER_NUMBER,
+	   TRIP_TIME,
+	   SCORE_FLOW_NUMBER,
+	   SCORE_FLOW_DIRECTION,
+	   FLOW_TYPE,
+	   CURRENT_DEAL_SCORE,
+	   REMAIN_SCORE,
+	   ONESELF_ACCOUNT,
+	   OTHERS_ACCOUNT,
+	   ONESELF_CARD_NUMBER,
+	   OTHERS_CARD_NUMBER,
+	   PROXY_ID,
+	   END_TIME,
+	   COMMENT,
+	   BILL_NUMBER,
+	   USER_ID,
+	   CURRENCY,
+	   PRODUCT_TYPE,
+	   USER_NAME
+	)
+	values
+	<foreach collection="innerSettleInfo.saScoreFlowRealList" item="flow" index="index"  open="" close=";" separator=",">
+		(
+		replace(uuid(),'-',''),
+		#{flow.dealRecordNumber},
+		#{flow.merchantOrderNumber},
+		#{flow.tripTime},
+		#{flow.scoreFlowNumber},
+		#{flow.scoreFlowDirection},
+		#{flow.flowType},
+		#{flow.currentDealScore},
+		#{flow.remainScore},
+		#{flow.oneselfAccount},
+		#{flow.othersAccount},
+		#{flow.oneselfCardNumber},
+		#{flow.othersCardNumber},
+		#{flow.proxyId},
+		#{flow.endTime},
+		#{flow.comment},
+		#{flow.billNumber},
+		#{flow.userId},
+		#{flow.currency},
+		#{flow.productType},
+		#{flow.userName}
+		)
+	</foreach>
+
+	update sa_deal_record set
+		DEAL_STATUS=1,DEAL_END_TIME=now()
+	where PRODUCT_TYPE = #{innerSettleInfo.saDealRecord.productType}
+	and MERCHANT_ORDER_NUMBER = #{innerSettleInfo.saDealRecord.merchantOrderNumber}
+	and REFUND_NUMBER = #{innerSettleInfo.saDealRecord.refundNumber}
+	and DEAL_TYPE = #{innerSettleInfo.saDealRecord.dealType};
+
+	update t_trans_order set
+	Status = #{innerSettleInfo.status,jdbcType=TINYINT},
+	Result = #{innerSettleInfo.result,jdbcType=TINYINT}
+	where TransOrderId = #{innerSettleInfo.saDealRecord.merchantOrderNumber,jdbcType=VARCHAR}
+</update>
+
+  <update id="baseUpdate" parameterType="org.hlpay.base.model.SaCard">
+  	update <include refid="tableName"></include>
+  	set
+  		<choose>
+  			<when test="flag == 0 and freezePart != null">
+  				FREEZE_PART=FREEZE_PART-#{freezePart},
+  			</when>
+  			<when test="flag == 1 and freezePart != null">
+  				FREEZE_PART=FREEZE_PART+#{freezePart},
+  			</when>
+  			<when test="flag == 0 and remainPart != null">
+  				REMAIN_PART=REMAIN_PART-#{remainPart},
+  			</when>
+  			<when test="flag == 1 and remainPart != null">
+  				REMAIN_PART=REMAIN_PART+#{remainPart},
+  			</when>
+  			<when test="flag == 0 and notBill != null">
+  				NOT_BILL=NOT_BILL-#{notBill},
+  			</when>
+  			<when test="flag == 1 and notBill != null">
+  				NOT_BILL=NOT_BILL+#{notBill},
+  			</when>
+  		</choose>
+  		CARD_ID=CARD_ID
+	where CARD_NUMBER=#{cardNumber}
+  </update>
+
+<update id="baseUpdateList" parameterType="java.util.List">
+	<foreach collection="list" item="item" index="index" open="" close="">
+		update <include refid="tableName"></include>
+		set
+		<trim suffixOverrides="," >
+		<choose>
+			<when test="item.flag == 0 and item.freezePart != null">
+				FREEZE_PART=FREEZE_PART-#{item.freezePart},
+			</when>
+			<when test="item.flag == 1 and item.freezePart != null">
+				FREEZE_PART=FREEZE_PART+#{item.freezePart},
+			</when>
+			<when test="item.flag == 0 and item.remainPart != null">
+				REMAIN_PART=REMAIN_PART-#{item.remainPart},
+			</when>
+			<when test="item.flag == 1 and item.remainPart != null">
+				REMAIN_PART=REMAIN_PART+#{item.remainPart},
+			</when>
+			<when test="item.flag == 0 and item.notBill != null">
+				NOT_BILL=NOT_BILL-#{item.notBill},
+			</when>
+			<when test="item.flag == 1 and item.notBill != null">
+				NOT_BILL=NOT_BILL+#{item.notBill},
+			</when>
+		</choose>
+		</trim>
+		where CARD_NUMBER=#{item.cardNumber};
+	</foreach>
+</update>
+
+<update id="baseUpdateCashSettleList" parameterType="java.util.List">
+	<foreach collection="list" item="item" index="index" open="" close="">
+		update sa_card_settle
+		set
+			CARD_STATUS = '4'
+		where CARD_NUMBER=#{item.cardNumber};
+	</foreach>
+</update>
+
+  <select id="baseInfo" resultMap="saCardMap">
+	select
+		*
+	from <include refid="tableName"></include>
+	where 1=1
+	<if test="userId != null">
+  		and USER_ID=#{userId}
+  	</if>
+  	<if test="cardNumber != null">
+  		and CARD_NUMBER=#{cardNumber}
+  	</if>
+  	<if test="cardType != null">
+  		and CARD_TYPE=#{cardType}
+  	</if>
+	<if test="currency != null">
+	  	and CURRENCY=#{currency}
+	</if>
+	<if test="validStartTime != null">
+	  and VALID_START_TIME = #{validStartTime}
+	</if>
+	<if test="validEndTime != null">
+	  and VALID_END_TIME = #{validEndTime}
+	</if>
+  </select>
+
+  <select id="getSaCardInfoByAccount" parameterType="org.hlpay.base.model.SaCard" resultMap="saCardMap">
+	select
+		*
+	from <include refid="tableName"></include>
+	where 1=1
+	<if test="cardNumber != null">
+  		and CARD_NUMBER=#{cardNumber}
+  	</if>
+  	<if test="cardType != null">
+  		and CARD_TYPE=#{cardType}
+  	</if>
+	<if test="currency != null">
+	  	and CURRENCY=#{currency}
+	</if>
+	<if test="validStartTime != null">
+	  and VALID_START_TIME = #{validStartTime}
+	</if>
+	<if test="validEndTime != null">
+	  and VALID_END_TIME = #{validEndTime}
+	</if>
+  	<if test="loginAccount != null">
+  		and LOGIN_ACCOUNT=#{loginAccount}
+  	</if>
+  </select>
+
+  <!-- 比豆排行榜 -->
+  <select id="descSaCard" resultMap="saCardMap">
+  	select
+		REPLACE
+	    (
+		  USER_NAME,
+		  substr(USER_NAME,2,if(char_length(USER_NAME)>2,char_length(USER_NAME)-2,1)),
+		  if(char_length(USER_NAME)>3,'**','*')
+		 )AS USER_NAME,(REMAIN_PART+FREEZE_PART)AS REMAIN_PART,LOGIN_ACCOUNT
+    from <include refid="tableName"></include>
+    where LOGIN_ACCOUNT NOT LIKE '10%'
+    order by (REMAIN_PART+FREEZE_PART) DESC limit 0,50;
+  </select>
+  <insert id="insertSaCard">
+  	insert into
+  		<include refid="tableName"></include>
+  	(
+  		<include refid="Field"></include>
+  	)
+  	values(
+	  	   #{cardId},#{cardNumber},#{configNumber},#{loginAccount},#{remainPart},
+  		   #{freezePart},now(),#{userId}
+  		   )
+  </insert>
+
+   <!-- 根据USER_ID查询积分卡详情 -->
+   <select id="infoSaCard" parameterType="String" resultMap="saCardMap">
+  	select
+  		*
+  	from <include refid="tableName"></include>
+  	<where>
+		<if test="userId != null and userId != ''">
+			USER_ID = #{userId} and IS_DELETE!=1
+		</if>
+  	</where>
+  </select>
+
+	<!-- 根据USER_ID和卡类型查询积分卡详情 -->
+	<select id="getCardsByUserIdAndCardType" parameterType="String" resultMap="saCardMap">
+		select
+		*
+		from <include refid="tableName"></include>
+		<where>
+			<if test="userId != null and userId != ''">
+				USER_ID = #{userId} and IS_DELETE!=1
+			</if>
+			<if test="cardType != null and cardType != ''">
+				CARD_TYPE = #{cardType} and IS_DELETE!=1
+			</if>
+		</where>
+	</select>
+
+	<!-- 根据USER_ID和卡类型查询积分卡详情 -->
+	<select id="getSettleCards" parameterType="String" resultMap="saCardMap">
+		select
+		*
+		from <include refid="tableName"></include>
+		<where>
+			<if test="userId != null and userId != ''">
+				USER_ID = #{userId}
+			</if>
+			<if test="currency != null and currency != ''">
+				and CURRENCY = #{currency}
+			</if>
+			<if test="cardType != null and cardType != ''">
+				and CARD_TYPE = #{cardType}
+			</if>
+			<if test="settleTime != null">
+				and VALID_START_TIME &lt;= #{settleTime} and VALID_END_TIME > #{settleTime}
+			</if>
+			and IS_DELETE!=1
+		</where>
+	</select>
+
+	<!-- 根据卡类型查询积分卡详情 -->
+	<select id="getCardsByCardType" parameterType="String" resultMap="saCardMap">
+		select
+		*
+		from <include refid="tableName"></include>
+		<where>
+			<if test="cardType != null and cardType != ''">
+				CARD_TYPE = #{cardType} and IS_DELETE!=1
+			</if>
+		</where>
+	</select>
+
+	<!-- 根据卡类型查询积分卡详情 -->
+	<select id="getCard" parameterType="String" resultMap="saCardMap">
+		select
+		*
+		from <include refid="tableName"></include>
+		<where>
+			<if test="userId != null and userId != ''">
+				USER_ID = #{userId} and IS_DELETE!=1
+			</if>
+			<if test="cardType != null">
+				and CARD_TYPE=#{cardType}
+			</if>
+			<if test="currency != null">
+				and CURRENCY=#{currency}
+			</if>
+			<if test="validStartTime != null">
+				and VALID_START_TIME = #{validStartTime}
+			</if>
+			<if test="validEndTime != null">
+				and VALID_END_TIME = #{validEndTime}
+			</if>
+		</where>
+	</select>
+
+  <update id="updateSaCard" parameterType="String">
+  	update <include refid="tableName"></include>
+  	set
+  		<choose>
+  			<when test="flag != null and flag == 1">
+  				REMAIN_PART=REMAIN_PART+#{remainPart}
+  			</when>
+  			<when test="flag != null and flag == 0">
+  				REMAIN_PART=REMAIN_PART-#{remainPart}
+  			</when>
+  			<otherwise>
+  				REMAIN_PART=REMAIN_PART
+  			</otherwise>
+  		</choose>
+	where CARD_NUMBER=#{cardNumber}
+  </update>
+
+  <update id="updateAll" parameterType="org.hlpay.base.model.SaCard">
+  	update <include refid="tableName"></include>
+  	set
+  		<if test="configNumber != null and configNumber !=''">
+  			CONFIG_NUMBER=#{configNumber},
+  		</if>
+  		<if test="cardStatus != null and cardStatus !=''">
+  			CARD_STATUS=#{cardStatus},
+  		</if>
+  		<choose>
+  			<when test="flag != null and flag == 1 and remainPart != null">
+  				REMAIN_PART=REMAIN_PART+#{remainPart}
+  			</when>
+  			<when test="flag != null and flag == 0 and remainPart != null">
+  				REMAIN_PART=REMAIN_PART-#{remainPart}
+  			</when>
+  			<otherwise>
+  				REMAIN_PART=REMAIN_PART
+  			</otherwise>
+  		</choose>
+	where
+	<if test="cardNumber != null and cardNumber !=''">
+			CARD_NUMBER=#{cardNumber}
+  	</if>
+  	<if test="userId != null and userId !=''">
+  			USER_ID=#{userId}
+  	</if>
+  </update>
+
+  <update id="update">
+		update
+	        <include refid="tableName"></include>
+	    set
+	    	REMAIN_PART=REMAIN_PART-
+	    	<foreach collection="maps" item="item" index="key"
+       			 separator=" " open="case USER_ID" close="end">
+       			 when #{key} then #{item}
+    		</foreach>
+
+
+  	where USER_ID in
+  	<foreach item="item" index="key" collection="maps"
+            open="(" separator="," close=")">
+	    #{key}
+    </foreach>
+  </update>
+
+  <!-- 查询所有积分卡 -->
+   <select id="listSaCard" parameterType="String" resultMap="saCardMap">
+  	select
+  		*
+  	from <include refid="tableName"></include>
+  </select>
+
+</mapper>

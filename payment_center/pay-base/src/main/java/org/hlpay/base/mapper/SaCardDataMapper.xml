@@ -1,0 +1,54 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="org.hlpay.base.mapper.SaCardDataMapper" >
+  <resultMap id="saCardDataMap" type="org.hlpay.base.model.SaCardData" >
+    <id column="DATA_ID" property="dataId"/>
+    <result column="DATA_NAME" property="dataName"/>
+    <result column="DATA_CODE" property="dataCode"/>
+    <result column="DATA_TYPE" property="dataType"/>
+    <result column="CREATE_TIME" property="createTime"/>
+    <result column="STATUS" property="status"/>
+    <result column="FLAG" property="flag"/>
+  </resultMap>
+
+  <!--表名 -->
+  <sql id="tableName">
+	sa_card_data
+  </sql>
+
+  <!-- 字段 -->
+  <sql id="Field">
+  	DATA_ID,
+  	DATA_NAME,
+  	DATA_CODE,
+  	DATA_TYPE,
+  	CREATE_TIME
+  </sql>
+
+  <sql id="FieldValue">
+  	replace(uuid(),'-',''),
+  	#{dataName},
+  	#{dataCode},
+  	#{dataType},
+  	now()
+  </sql>
+
+  <insert id="baseInsert" parameterType="org.hlpay.base.model.SaCardData" >
+	insert into
+		<include refid="tableName"></include>
+		(
+			<include refid="Field"></include>
+		)
+		values
+		(
+			<include refid="FieldValue"></include>
+		)
+  </insert>
+
+  <select id="baseLimitSelect" parameterType="org.hlpay.base.model.SaCardData" resultMap="saCardDataMap">
+  	select
+  		*
+  	from <include refid="tableName"></include>
+  </select>
+
+</mapper>

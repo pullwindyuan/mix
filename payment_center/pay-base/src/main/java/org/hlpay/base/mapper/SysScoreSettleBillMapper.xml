@@ -1,0 +1,166 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="org.hlpay.base.mapper.SysScoreSettleBillMapper" >
+  <resultMap id="sysScoreSettleBillMap" type="org.hlpay.base.model.SysScoreSettleBill" >
+    <id column="BILL_ID" property="billId"/>
+    <result column="BILL_NUMBER" property="billNumber"/>
+    <result column="BILL_START_DATE" property="billStartDate"/>
+    <result column="BILL_END_DATE" property="billEndDate"/>
+    <result column="CARD_NUMBER" property="cardNumber"/>
+    <result column="LOGIN_ACCOUNT" property="loginAccount"/>
+    <result column="CURRENT_SETTLE_SCORE" property="currentSettleScore"/>
+    <result column="BILL_DATE" property="billDate"/>
+    <result column="SETTLE_DATE" property="settleDate"/>
+    <result column="BILL_STATUS" property="billStatus"/>
+    <result column="CREATE_TIME" property="createTime"/>
+    <result column="USER_ID" property="userId"/>
+    <result column="IS_DELETE" property="isDelete"/>
+    <result column="FLAG" property="flag"/>
+    <result column="STATUS" property="status"/>
+  </resultMap>
+
+  <!--表名 -->
+  <sql id="tableName">
+	sys_score_settle_bill
+  </sql>
+
+  <!-- 字段 -->
+  <sql id="Field">
+  	BILL_ID,
+  	BILL_NUMBER,
+  	BILL_START_DATE,
+  	BILL_END_DATE,
+  	CARD_NUMBER,
+  	LOGIN_ACCOUNT,
+  	CURRENT_SETTLE_SCORE,
+  	BILL_DATE,
+  	SETTLE_DATE,
+  	BILL_STATUS,
+  	CREATE_TIME,
+  	USER_ID
+  </sql>
+
+  <insert id="insertSettleBill">
+  	insert into
+  		<include refid="tableName"></include>
+  	(
+  		<include refid="Field"></include>
+  	)
+  	values(
+  		   replace(uuid(),'-',''),#{billNumber},#{billStartDate},#{billEndDate},#{cardNumber},
+  		   #{loginAccount},#{currentSettleScore},#{billDate},#{settleDate},#{billStatus},
+  		   now(),#{userId}
+  		   )
+  </insert>
+
+  <insert id="insert">
+  	insert into
+  		<include refid="tableName"></include>
+  	(
+  		<include refid="Field"></include>
+  	)
+  	values
+  		   <foreach collection="userIdList" item="item"  separator=",">
+  		   	 (  replace(uuid(),'-',''),
+	  		   CONCAT('BL',(UNIX_TIMESTAMP(now())+CEIL(RAND()*899+100))),
+	  		   #{sa.billStartDate},
+	  		   #{sa.billEndDate},
+	  		   (select CARD_NUMBER FROM sa_card where USER_ID=#{item} and IS_DELETE!=1),
+	  		   (select LOGIN_ACCOUNT FROM sys_u_user where USER_ID=#{item} and IS_DELETE!=1),
+	  		   (select
+				  max(REMAIN_SCORE)
+				from sa_score_flow
+				where IS_DELETE!=1 and ISNULL(BILL_NUMBER) and USER_ID=#{item}),
+	  		   #{sa.billDate},
+	  		   #{sa.settleDate},
+	  		   0,
+	  		   #{sa.createTime},
+	  		   #{item}
+	  		   )
+  		   </foreach>
+  </insert>
+
+  <delete id="deleteSettleBill" parameterType="String">
+  	update
+  		<include refid="tableName"></include>
+  	set
+  		IS_DELETE=1
+  	where BILL_ID = #{billId}
+  </delete>
+
+  <update id="updateSettleBill">
+  	update
+  		<include refid="tableName"></include>
+  	set
+  		<if test="billStatus != null and billStatus != ''">
+  			BILL_STATUS=#{billStatus},
+  		</if>
+  		BILL_ID = BILL_ID
+  	where BILL_ID = #{billId}
+  </update>
+
+  <select id="selectSettleBill" resultMap="sysScoreSettleBillMap">
+  	select
+  		*
+  	from <include refid="tableName"></include>
+  	where IS_DELETE!=1 and USER_ID=#{userId}
+  	<if test="billStatus != null and billStatus != ''">
+  		and BILL_STATUS=#{billStatus}
+  	</if>
+  	<if test='createTime != null and createTime != ","'>
+		and CREATE_TIME <![CDATA[>=substring(#{createTime},1,LOCATE(",",#{createTime})-1)]]>
+		and CREATE_TIME <![CDATA[<=substring(#{createTime},LOCATE(",",#{createTime})+1)]]>
+  	</if>
+  </select>
+
+  <select id="getBill" parameterType="String" resultType="java.util.Map">
+  	select
+  		USER_ID,BILL_NUMBER
+  	FROM <include refid="tableName"></include>
+  	where CREATE_TIME=#{createTime}
+  </select>
+
+   <select id="limitSettleBill" resultMap="sysScoreSettleBillMap">
+  	select
+  		*
+  	from <include refid="tableName"></include>
+  	where IS_DELETE!=1 and USER_ID=#{userId}
+  	order by CREATE_TIME desc limit 0,3
+  </select>
+
+   <select id="infoSettleBill" parameterType="String" resultMap="sysScoreSettleBillMap">
+  	select
+  		*
+  	from <include refid="tableName"></include>
+  	<where>
+		<if test="billId != null and billId != ''">
+			BILL_ID = #{billId} and IS_DELETE!=1
+		</if>
+  	</where>
+  </select>
+
+  <select id="count" parameterType="String" resultType="int">
+  	select
+  		count(BILL_ID)
+  	from <include refid="tableName"></include>
+  	where IS_DELETE!=1 and USER_ID=#{userId}
+  	<if test="billStatus != null and billStatus != ''">
+  		and BILL_STATUS=#{billStatus}
+  	</if>
+  	<if test='createTime != null and createTime != ","'>
+		and CREATE_TIME <![CDATA[>=substring(#{createTime},1,LOCATE(",",#{createTime})-1)]]>
+		and CREATE_TIME <![CDATA[<=substring(#{createTime},LOCATE(",",#{createTime})+1)]]>
+  	</if>
+  </select>
+
+  <select id="totalBill" parameterType="String" resultType="int">
+  	select
+  		IFNULL(sum(CURRENT_SETTLE_SCORE),0)
+  	from <include refid="tableName"></include>
+  	where IS_DELETE!=1 and USER_ID=#{userId}
+  	<if test="billStatus != null and billStatus != ''">
+  		and BILL_STATUS=#{billStatus}
+  	</if>
+  </select>
+
+</mapper>

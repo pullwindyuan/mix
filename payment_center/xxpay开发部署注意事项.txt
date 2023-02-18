@@ -1,0 +1,274 @@
+﻿开发记录：
+一、payOrderTest测试方法目前已经测试通过微信的支付接口。
+需要注意一下几点：
+1、测试WX_JSAPI时需要预先通过其他途径获取到用户openID，并填写到extra参数中，这里填写的是我自己的，openId后端无法直接获取，只能通过微信内页面获取。
+
+二、重要数据表说明
+1、商户表：商户就是需要接入本交易中心的客户，商户ID需要和支付渠道绑定，一个商户可以拥有多个支付渠道；
+2、支付渠道表：支付渠道表里记录了所有需要接入的支付渠道信息，一个支付渠道只能对应一个商户ID，如果需要多个商户公用一个渠道ID
+            ，那么就需要重复的创建支付渠道，只是商户ID不同。比如一个公司一共有3个服务号需要接入支付，但是一个公司只能申
+            请一个支付商户，但是一个商户可以绑定多个AppID，所以这样就可以一个支付渠道对应多个商户了。该表的数据唯一性判定
+            标准就是：商户ID + 渠道ID（如：WX_JSAPI）
+
+当渠道名称为WX时，支付渠道参数为：{"mchId":"xxx", "appId":"xxx", "key":"xxx", "certLocalPath":"xxx", "certPassword":"xxx"}
+其中：
+mchId		为支付渠道商户ID；
+appId为		对应的微信公众号appId；
+certLocalPath	为从微信商户管理后台下载的证书然后保存到服务器上的路径，比如：/home/xxpay/service/cert/apiclient_cert.p12；证书只有在开发企业支付的时候使用，比如退款操作
+key		貌似可以不需要；
+certPassword	为商户生成证书的时候提示输入的证书密码，如果创建证书时没有输入，默认为商户号，也就是商户ID；
+
+当渠道名称为ALIPAY时，支付渠道参数为：{"isSandbox":1,"appid": "xxx", "private_key": "xxx", "alipay_public_key": "xxx"}
+
+测试地址：http://pay.bibi321.com/qrPay.html?amount=2&openId=olnubwX4ymYu0vCZacRtLShuCQy8
+二、接入测试可以参考：http://docs.xxpay.org/docs/deploy/40
+微信网页授权部分可以申请测试微信号用于开发测试：
+http://mp.weixin.qq.com/wiki?t=resource/res_main&id=mp1421137522
+
+三、微信公众号开发测试对域名要求很严格，具体表现为如下几点：
+1、微信公众号发起支付的页面必须是公众号内页面，而且该页面必须是在微信公众号设置为授权页面，所以该页面必须是80端口，而且该页面也必须是JS调用授权目录。
+2、微信商户后台可以配置最多5个支付授权页面，这5个页面也必须是80端口
+3、微信公众号页面主要是负责获取用户的openId和access_token，这一点对php开发的服务基本不用关注，但是如果是java开发的前后端未分离的后台应用，如果端口是非80的就要注意了。
+4、微信支付一旦获取到了openId和access_token等关键敏感信息后，在支付的过程中就和公众号的页面暂时没关系了；
+5、一旦支付成功后，微信支付后台需要异步回调一个重定向页面，也就是redirect_URI，这个页面必须是微信公众号的左侧边栏的》公众号设置->功能设置下的“网页授权域名”下的页面，而且不能带任何端口号。
+
+
+=========现已集成银联支付到本项目===================
+由于回调的关系，支付服务需要部署到公网
+银联测试证书下载地址（如果发现再回调处理的时候报错：缺少验签证书的话，问题多半是证书过期，请下载最新的）：
+https://open.unionpay.com/ajweb/help/file/techFile?cateLog=Development_kit
+
+shop和mgr可以部署到本地
+目前测试入口（shop部署地址）：
+pay.bibi321.com/unionPay/pay.html?amount=101&channelId=UNION_PC&redirectUrl=http://m.bibi321.com
+payOrderTest测试方法也同样集成银联支付，目前只能完成生成支付订单的过程（能完成这个阶段的测试，整个支付也就完成了9成）
+GoodsOrderController任然是shop的接口类
+
+xxpay4spring-boot是核心支付服务：
+银联支付的代码分布如下：
+org.xxpay.boot：支付核心服务
+ctl:
+	Notify4UnionPayController:接收银联后台异步通知的接口
+	PayOrderController:支付中心统一下单接口增加银联入口
+service:
+	channle:
+		unionpay:银联支付核心代码均在此处
+	impl:
+		NotifyPayServiceImpl:接收后台异步通知的服务实现类增加银联部分
+		PayOrderServiceImpl:支付中心统一下单服务增加银联部分
+	INotifyPayService:接收后台异步通知的服务接口类增加银联部分
+	IPayOrderService:支付中心统一下单接口增加银联部分
+resource:
+	acp_sdk.properties:银联支付安全证书相关配置文件
+	application.yml:应用配置增加银联部分
+
+org.xxpay.shop：支付接入商户示例
+controller:
+	GoodsOrderController:商品下单接口增加银联支付部分
+demo:
+	PayOrderDemo:支付测试方法通过更改支付渠道为银联渠道（UNION_PC、UNION_WAP）即可测试
+resource:
+	templates:前端测试页面
+		css:
+		index.ftl:
+		pay.ftl:
+
+org.xxpay.mgr
+resource:
+	templates:
+		pay_channel:
+			edit.ftl：后台管理页面增加银联支付渠道的选项
+
+
+配置相关的文件：
+acp_sdk.properties：配置证书
+application.yml：配置url等
+GoodsOrderController和PayOrderDemo：代码开始有一部分需要配置的信息，主要是为了测试方便，这部分的配置也是应用接入支付中心必须要设定好的参数。
+
+测试证书目前放在：
+/home/pay/cert/union/
+测试账号信息：
+卡号 ：
+6216261000000000018
+姓名：全渠道
+证件号 ：341126197709218366
+控件短信验证码 ：123456
+注意：如果是360浏览器请开启兼容模式，否则无法测试
+
+本次集成和原来的微信支付、支付宝支付使用了统一接口，所以能够保证外部接口的一致性。
+
+=====================支付宝沙箱测试=========================
+一：登录蚂蚁金服开放平台：https://open.alipay.com/developmentAccess/developmentAccess.htm
+RSA密钥准备：
+参考：https://doc.open.alipay.com/docs/doc.htm?treeId=291&articleId=105971&docType=1
+1、下载和操作系统对应的证书生成工具；
+2、直接选择顶部的“生成密匙”标签页后，勾选密匙格式PKCS8(JAVA适用)：勾选密匙长度2048：点击生成密匙。生辰以后可以点击打开密匙文件路径查看生成的“商户应用私匙”和“商户应用公匙”
+3、复制公匙到剪贴板（等下用到），建议不要关闭应用，等下配置支付渠道参数的时候需要使用到“商户应用私匙”。
+步骤说明：
+1、使用手机支付宝可以扫码登陆，然后进入：管理中心->开发者中心（如果还没申请成为自研开发者需要先申请再进入下一步）->研发服务；
+2、进入沙箱应用设置，信息配置中的必看部分需要先上传应用公钥，这里只需要点击上传应用公匙并把之前复制好的应用公匙粘贴上即可，确认保存后就查看支付宝公匙了，至此基本配置就完成了。选看部分可以不用设置；、
+3、下载android沙箱专用钱包，用于沙箱测试；
+4、点击沙箱账号后可以查看你的商家信息下（支付中心配置支付宝支付渠道时需要使用）和买家信息（沙箱测试支付的时候使用这个账号信息），这里可以给自己多充点，机会难得，千万不要错过，身价过亿只是秒秒钟的事情；
+至此沙箱支付宝的测试账号准备完成，接下来我们就要到我们的支付中心的后台管理(mgr)中的去配置支付包支付渠道了
+1、进入mgr后台管理
+2、添加一个商户（参考微信测试部分的讲解）并设置好自定义的请求私钥和响应私钥，这两个参数这里再解释下：只参与商户接入本支付中心的接口调用和返回的签名验证，和实际支付渠道无关，所以时由开发者自己设置，灭有任何限制，不用担心，只要接入应用也使用对应的密匙既可以。
+3、添加该商户对应的支付宝渠道（一个商户可以对应多个支付渠道，但是同一个商户的同一个支付渠道下只能存在一个渠道，比如比比旅行设置了支付宝移动支付渠道的A配置，如果继续添加一个支付宝移动支付渠道，只是将渠道的商户ID等账号信息修改的话时不可以的。也就是说再本支付中心，商户和一个具体的支付渠道类型对应关系时唯一的，这样应用再进行统一下单的时候才能通过传入商户信息和支付渠道（如））
+ALIPAY_PC)后，支付中心就能够根据接入商户ID和支付渠道找到唯一的一条实际支付渠道配置信息。
+4、支付宝支付渠道的配置说明如下：
+商户ID：填写已经添加好的商户ID（不是支付渠道的商户ID，千万注意）；
+渠道ID：如：ALIPAY_PC、ALIPAY_WAP选择其一
+渠道名称：选择ALIPAY
+渠道商户ID：填写再沙箱测试环境准备工作中的沙箱账号下的商家信息中的商户UID；
+参数：{"isSandbox":1,"appid": "***", "private_key": "***", "alipay_public_key": "***"}，其中appid沙箱应用的APPID；private_key为工具生成的“商户应用私匙”；alipay_public_key为沙箱应用中配置中得到的“支付宝公匙”。
+5、配置完以上信息后就可以到项目中配置参数了
+修改xxpay-shop项目，修改org.xxpay.shop.controller.GoodsOrderController.java中的mchId为支付宝渠道对应的商户ID,reqKey、resKey为商户配置里的对应值，baseUrl为支付中心服务（xxpay4spring-boot）的部署地址，比如：http://pay.bibi321.com:3020/api
+6、开始测试：
+1分钱手机支付宝测试：http://localhost:8081/goods/toAliPay.html?amount=1&channelId=ALIPAY_WAP
+1分钱网站支付宝测试：http://localhost:8081/goods/toAliPay.html?amount=1&channelId=ALIPAY_PC
+1分钱APP支付宝测试：http://localhost:8081/goods/toAliPay.html?amount=1&channelId=ALIPAY_APP
+localhost:8081为shop项目的部署地址，由于我把GoodsOrderController类的@RequestMapping("goods")该成了@RequestMapping("")，所以测试地址应该是http://localhost:8081/toAliPay.html?amount=1&channelId=ALIPAY_WAP。端口号请根据实际情况自行调整
+7、下单完成后需要使用沙箱支付宝应用扫码支付或者使用沙箱配置中的买家账号信息登陆支付，切记不要使用手机登陆支付，应为沙箱中根本无法收到手机短信验证码。
+
+符：
+支付宝测试账号信息
+接入产品APPID：
+2016091200495695；
+
+授权回调地址：
+http://pay.bibi321.com/notify/pay/aliPayNotifyRes.htm。实际测试根据实际情况到支付宝沙箱配置中设置
+
+支付宝网关：
+https://openapi.alipaydev.com/gateway.do
+
+支付宝公匙：
+MIIBIjANBgkqhkiG9w0BAQEFAAOCAQ8AMIIBCgKCAQEAspgs/p2Gn/2j959KTQpvM7FQn6WV9zopmx1qlGAYFNFE4cIF/rTxiGTA87AYVxLpspB6/XMkIXy9nT7amYtVKXJd78XsbrIMehXb1/DRg/nNnz6YbcsmE/9btI/R9z5jfLnGns9Bu0uy6Pwo/8DHtPV1IDMPcsqnaBkjoTh51NKXVZ1fCt1uvSER5URPXZz/nkd5BW0T6+NACleIjozLK9tnSK7ZN9xh4jEQISvxyNoe46nrLRTBh/HJ5rbyX31IfDvjghHMTkEIRdlY4+vTZ5OXcH84yJukpqgjiY+WpTTOS32AW4AzmxTFoh+Wvh9NoXGj/KZmbsq0m9mcH23PyQIDAQAB
+
+商户应用私匙：
+MIIEvAIBADANBgkqhkiG9w0BAQEFAASCBKYwggSiAgEAAoIBAQCeZ0iYfL+c3d+Gdcf3xDet8ZpZPCMMUz0BxOgULaZoO10lMfGziL4NfC6FBd7VgrM4qUNBcjxjaskf+fJJ/q3R/nlcJuc5DilagYyBDke6xjKnH7LkIKJgYsc7x1znx21cQyzANdkV1BgNR16xJ7MKgDSExPrPHu0hlfDtB6fJq+U/i7BanExwPgJCmdWqQvpUppVFL8U5xnGBH/+h8Mk/lowyRjrOW6af7ZdSXMj4H4ldzbMzONyU0HzzZrPlOPBQceeEYUpApPPd1IBav7od75nKGgj9j3FWcMZIxI0PjWDj8kKcK1yh+u/hw+6O4mq3SvzhVV2dm3HggxCkK7VvAgMBAAECggEAVdjn8Sx6tEtS3w5qJ4+CFZVA72e2HvHluFW86WKsMwUpQAVHVuOfDLPmilVaJSDGfMjPGGMO81pmUhwmAZAzKAHgR98VpUhVhSV8vly85y6POR/m1dgR6GbgTzeG1F6ymDQXxrvoQPpHZrrtSNmZIPHGhMY0n5fFMFSQ1AU4HAVgR+w0T10g8JdfpZd5T2sVTwDS9bZllaWCG/++qDWAgxZUY1lAY1O2XD+hodIS+UqPX8HalNDydZPu7G7mqFkTeIFoBFwRBD78A2JWQh7a2YhA6sVoEt6sFqDL5xbMoEGOzEf6o7c42r8Z8ww9+MdMXY7R9krZEj7Tow5gX6WtkQKBgQDYobD9MIzwbSwtRh+kmFX4u8MnSIfh9DTMxP8e4l5e6kZArvVuf3r4L5YrtAjFOMp/OPfv1MMlWEZuEJCfjf0oBpLSYXY0i48xJZG3zRZ254MtbH5jfZa8XEK+87Y2o+wMP/pVd2zs/KFiFMfd92TU7UoJnXCPJJ5YQ7odxy2jSwKBgQC7MKfMSwvL8r/WIeuEhxq2MMfag+sjzvPbL0rv07V3zqerYGPfDuNDlDxHAfuV/pM8jTiif1gnxbnmDzyFRmmyOMwmz6fFKtBr6JtleWZXDz/ZIrR+A7xX7pkWMfbbc3EiB6E2TZGddSyo7dmXNUyfbTuyHWKGvAyN1C69G9P77QKBgAOVSRQnBW3EoIJvMn7KdkGS+Xtg276FB4qLh5y/KchwH5FaU3zsZuBMCTPX2n1InzDThGZXIpMvjpqrc3jwJEvRMASC0C22UTwC3xInNkPpOGY78Ss8HI4pCIGYDl+A/pqFRGK9gvO4igLRTS0Ctow/EIZwMDht5qCXHjD35m1ZAoGAEYUuT2q+weoIlow6NP9IOsE6E3PBcGqQXHWCuAvCsmH/Q4UUE+6aytp3AdZnq9RWB5bYNC1jHOXezm+ipH7AqdOzF/bbpxKoy1DMKqVANOnSegpLhnfnCvvkDDXE+ylE74BzUFfWRzyOX4lTklmEwG9C5Rrm++Fh82xmq4CNSMkCgYAV80wL9xO2IUIufQi3H8rGSJzRgNZoIow1sNRZV4+H8ISo2v0qRg6LKwr9Bw90GIBCI53nimLNgia9ni2Jt7/zWcNr7GhNqoIMCnrJsBsi60LAeoGrZAgzj3ypeVEaE3Bjy96mwr7qajQL+Yg0R6EAOYHh9Kz5KxDFTgbEga9Arg==
+
+支付账号信息：
+商家账号
+xrahso0623@sandbox.com
+商户UID
+2088102175326995
+登录密码
+111111
+
+买家账号
+hvhlnb2833@sandbox.com
+登录密码
+111111
+支付密码
+111111
+用户名称沙箱环境
+证件类型身份证(IDENTITY_CARD)
+证件号码
+073128192708195138
+
+http://localhost:8080/unionPay/pay.html?amount=1&channelId=UNION_PC
+http://localhost:8080/toAliPay.html?amount=1&channelId=ALIPAY_WAP
+http://ms.bibi321.com/toAliPay.html?amount=1&channelId=ALIPAY_PC&redirect=http://m.bibi321.com
+对异常订单补单的办法：
+1、通过主动查询接口来校准订单状态，这样基本就能全流程补全，包括订单状态和通知
+/pay/query_order?接口
+可以通过运行payOrderDemo中的查询测试方法
+2、如果通知有问题，可以手动调用
+http://pay.bibitrip.com/api/open/notify/sendPayNotify?orderId=FBBTO20180912105419001来补发通知
+
+退款
+参考：
+支付宝https://docs.open.alipay.com/api_1/alipay.trade.refund
+微信https://pay.weixin.qq.com/wiki/doc/api/jsapi.php?chapter=9_4
+
+退款测试：运行shop项目的RefundOrderDemo即可，参数需要根据实际存在的订单信息进行修改，测试前需要先部署和运行XxPayBootAppliaction
+TODO
+后台管理订单管理中添加退款按钮（测试专用，正常情况需要授权）
+退款完成后需要同步更新原支付订单状态为退款完成
+支付中的订单由于网络原因没能支付完成的可以重新发起支付，所以需要提供重新支付的接口，为了保证接口统一，商户在发起重新支付的时候不需要使用额外的接口
+而是通过参数的差异来控制，因为反应到后台的核心支付流程中，重新支付的差异只是跳过创建订单的过程
+关键方法，根据商户订单号和商户ID查找支付订单信息：selectPayOrderByMchIdAndMchOrderNo
+测试：http://pay.bibi321.com/rePay?mchId=10000000&mchOrderNo=G20180305154222000001&channelId=UNION_PC
+2018-03-03：完成重新支付接口，支付宝测试通过，微信和银联待测试
+
+TODO
+统一支付状态查询接口，通过该接口对异常订单进行支付状态核验，以便更新支付中心订单状态，同时在进行repay的支付行为时也需要先调用状态查询在进行实际支付行为
+在PayOrderServiceImpl中将queryPayOrder方法添加各个渠道的查询方法即可
+支付宝
+PayChannel4AliServiceImpl中添加queryPay方法
+微信支付：完成
+银联支付：完成接口调试、需要对返回数据做统一处理，目前没有返回任何数据
+
+TODO
+退款结果处理:在PayChannel4AliServiceImpl的doAliRefundReq方法中处理
+和支付不一样，支付实在异步通知中处理，退款在同步返回结果中处理（退款无异步通知）。
+转账同理操作
+
+TODO
+MQ消息失败率太高，需要替换掉ActiveMQ，使用rabbitmq
+
+大事记：
+2018-02-27
+增加商户自定义redirectUrl参数(该参数只对支付宝和银联支付有效，微信支付无需该参数)，这样可以让不同商户支付完成后跳转到各自的业务处理页面
+redirectUrl参数支付中心会检查，如果为空或者不合法，将会使用支付中心的默认页面替代
+
+微信和支付宝支付测试通过；
+退款测试通过；
+测试地址汇总：
+银联：
+测试账号信息：
+卡号 ：
+6216261000000000018
+姓名：全渠道
+证件号 ：341126197709218366
+控件短信验证码 ：123456
+pay.bibi321.com/unionPay/pay.html?amount=1&channelId=UNION_PC&redirect=http://m.bibi321.com
+支付宝：
+买家账号
+hvhlnb2833@sandbox.com
+登录密码
+111111
+支付密码
+111111
+http://192.168.56.1:8088/toAliPay.html?amount=1&channelId=ALIPAY_WAP&redirect=http://m.bibi321.com
+http://localhost:8080/toAliPay.html?amount=1&channelId=ALIPAY_WAP&redirect=http://m.bibi321.com
+二维码：
+http://pay.bibi321.com/openQrPay.html?amount=1&channelId=ALIPAY_PC&redirect=http://m.bibi321.com
+
+微信H5支付测试
+http://shop.bibi321.com/toWxPay.html?amount=1&redirect=http://m.bibi321.com
+
+对未支付订单发起重新支付测试：
+http://pay.bibi321.com:8080/rePay?mchId=10000000&payOrderId=432625341027057664&channelId=ALIPAY_WAP&redirect=http://m.bibi321.com
+http://pay.bibi321.com:8080/rePay?mchId=10000000&mchOrderNo=G20180408193836000001&channelId=ALIPAY_WAP&redirect=http://m.bibi321.com
+http://pay.bibi321.com:8080/rePay?mchId=10000000&mchOrderNo=G20180408193836000001&payOrderId=432625341027057664&channelId=ALIPAY_WAP&redirect=http://m.bibi321.com
+附：
+支付服务器地址：120.79.2.82
+
+直接测试：
+http://gate.bibitrip.com:8765/api/payment/api/pay/create_order?params={"amount":1,"mchId":"10000000","redirectUrl":"http://m.bibi321.com","mchOrderNo":"G20180412120017000007","subject":"商品G_0001","sign":"4FD75244E2748D511A0899BDA4DB553B","body":"商品G_0001","param1":"","param2":"","clientIp":"114.112.124.236","extra":"{}","notifyUrl":"http://shop.bibi321.com/payNotify","currency":"cny","device":"WEB","channelId":"ALIPAY_WAP"}
+params={"amount":1,"mchId":"10000000","redirectUrl":"http://m.bibi321.com","mchOrderNo":"G20180412120017000007","subject":"商品G_0001","sign":"4FD75244E2748D511A0899BDA4DB553B","body":"商品G_0001","param1":"","param2":"","clientIp":"114.112.124.236","extra":"{}","notifyUrl":"http://shop.bibi321.com/payNotify","currency":"cny","device":"WEB","channelId":"ALIPAY_WAP"}
+压力测试过程中出现了ID重复，只要原因是在IDEA中起的多个任务并发导致的，因为测试任务开始时使用了简单的获取系统毫秒时间来
+生成的商户订单号，这就导致了并发时商户订单号的重复。后来使用了SnowflakeId来生成，并给每个任务设置不同的机器ID和数据ID。
+
+对于分高并发的情况，切记不要使用简单的获取系统毫秒数的办法来生成全局ID
+
+TODO
+支付中心必须以微服务的形式来投入生产，为了更好的提供服务可以采用一下策略：
+1、为接入的不同商户提供独立的服务和数据库，数据库独立等同于水平拆分数据库；
+2、每个接入商户由多个微服务
+
+比如我们可以把机票、酒店、旅游等多个产品设为独立商户，这样为三个产品提供独立的支付服务，每个产品又可以部署多个服务
+
+这样做唯一会增加的难度在于支付中心全局后台管理的开发，但是也可以采用每个接入商户配置一个独立后台管理中心。支付中心总
+后台管理通过API的方式去访问各个商户的后台管理获取必要的统计数据，那么在商户接入的时候除了分配商户支付渠道必要的信息外
+还需要配置好商户支付服务的相关url。总后台做统计查询的时候，需要和各商户的支付中心进行通讯。为了提高效率，订单号需要
+一个前缀，通过前缀可以明确的分辨出属于那个商户的订单。这样可以快速路由。
+
+对外使用同一个网关提供服务，部署多个注册中心，互相注册。每个注册中心均配置一个网关服务，比如使用3个服务器部署一个简单的
+集群。每组服务器都可以为每个商户提供服务。随着商户接入的增加，就需要增加服务器来部署
+
+分布式数据库的方案可以使用开源的TiDB，该方案对物理机数量和存储介质有要求，比如需要SSD来部署
+内部支付返回结果：
+支付下单返回：{"payOrderId":"1534387928477","sign":"902966D8587780CF19CFEDCB2239D8BA","resCode":"SUCCESS","retCode":"SUCCESS","retMsg":"","isSuccess":true}
+支付结果返回：{"payOrderId":"1534387928477","sign":"3EDDD1E6565134756D67860114D6ADE2","resCode":"SUCCESS","channelOrderNo":"1534387928477","retCode":"SUCCESS","retMsg":"","isSuccess":true}
+分账结果返回：{"settle":[{"amount":"500","productCode":"SP","phone":"13751003379","mchOrderNo":"89024657623578966754","currency":"htl","dealType":"1","userId":"dcf04ab1c28a472180cb61a0a9f093f2"},{"amount":"500","productCode":"FZ","phone":"13751003379","mchOrderNo":"252786546289476998","currency":"htl","dealType":"1","userId":"B46968147C9741C6814B77B1B904DC97"}],"sign":"5AAAED840F0A37ECA45F0E96C44A28D4","resCode":"SUCCESS","channelOrderNo":"1534387928477","retCode":"SUCCESS","retMsg":"","isSuccess":true}

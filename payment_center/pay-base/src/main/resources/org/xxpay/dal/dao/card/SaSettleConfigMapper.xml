@@ -1,0 +1,62 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="org.xxpay.dal.dao.card.mapper.SaSettleConfigMapper" >
+  <resultMap id="saSettleConfigMap" type="org.xxpay.dal.dao.card.model.SaSettleConfig" >
+    <id column="CONFIG_ID" property="configId"/>
+    <result column="CONFIG_NUMBER" property="configNumber"/>
+    <result column="LIQUIDATE_MODE" property="liquidateMode"/>
+    <result column="LIQUIDATE_DATE" property="liquidateDate"/>
+    <result column="LIQUIDATE_TIME" property="liquidateTime"/>
+    <result column="SETTLE_MODE" property="settleMode"/>
+    <result column="SETTLE_DATE" property="settleDate"/>
+    <result column="WEEKEND_SETTLE" property="weekendSettle"/>
+    <result column="HOLIDAY_SETTLE" property="holidaySettle"/>
+    <result column="CREATE_TIME" property="createTime"/>
+    <result column="LAST_UPDATE_TIME" property="lastUpdateTime"/>
+    <result column="USER_ID" property="userId"/>
+    <result column="IS_DELETE" property="isDelete"/>
+    <result column="FLAG" property="flag"/>
+    <result column="STATUS" property="status"/>
+  </resultMap>
+
+  <!--表名 -->
+  <sql id="tableName">
+	sa_settle_config
+  </sql>
+	
+  <!-- 字段 -->
+  <sql id="Field">
+  	CONFIG_ID,
+  	CONFIG_NUMBER,
+  	LIQUIDATE_MODE,
+  	LIQUIDATE_DATE,
+  	LIQUIDATE_TIME,
+  	SETTLE_MODE,
+  	SETTLE_DATE,
+  	WEEKEND_SETTLE,
+  	HOLIDAY_SETTLE,
+  	CREATE_TIME,
+  	LAST_UPDATE_TIME,
+  	USER_ID
+  </sql>
+  
+  <insert id="save">
+  	insert into 
+  		<include refid="tableName"></include>
+  	(
+  		<include refid="Field"></include>
+  	)
+  	values(
+  		   replace(uuid(),'-',''),#{configNumber},#{liquidateMode},#{liquidateDate},#{liquidateTime},#{settleMode},
+  		   #{settleDate},#{weekendSettle},#{holidaySettle},now(),#{lastUpdateTime},#{userId}
+  		   )
+  </insert>
+  
+  <select id="selectSaSettleConfig" parameterType="String" resultMap="saSettleConfigMap">
+  	select
+  		*
+  	from <include refid="tableName"></include>
+  	where IS_DELETE!=1 and USER_ID=#{userId}
+  </select>
+  
+</mapper>

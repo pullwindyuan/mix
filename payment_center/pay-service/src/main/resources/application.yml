@@ -1,0 +1,4 @@
+##特别提醒：切换开发和生产配置的时候，一定记得将MqConfig的内容用对应MqConfigDev或者MqConfigProd里的内容替换
+#spring:
+#    profiles:
+#        active: dev

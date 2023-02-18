@@ -1,0 +1,66 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.futuremap.erp.module.auth.mapper.RoleResourceMapper">
+    <select id="findList" resultType="com.futuremap.erp.module.auth.entity.RoleResource">
+        select
+        id,
+        resource_id,
+        role_id,
+        role_name,
+        created_by,
+        created_at,
+        updated_by,
+        updated_at,
+        del_status
+
+        from
+        auth_role_resource
+        <where>
+            del_status =0
+            <if test="roleResource.id !=null and roleResource.id !=''">
+                and id = #{roleResource.id}
+            </if>
+            <if test="roleResource.roleId !=null and roleResource.roleId !=''">
+                and role_id = #{roleResource.roleId}
+            </if>
+            <if test="roleResource.resourceId !=null and roleResource.resourceId !=''">
+                and resource_id = #{roleResource.resourceId}
+            </if>
+            <if test="roleResource.roleName !=null and roleResource.roleName !=''">
+                and role_name like  CONCAT("%",#{roleResource.roleName},"%")
+            </if>
+        </where>
+
+    </select>
+    <select id="findListByRoleIds" resultType="com.futuremap.erp.module.auth.entity.RoleResource">
+        select
+        rr.id,
+        resource_id,
+        r.`level`,
+        role_id,
+        role_name,
+        created_by,
+        created_at,
+        updated_by,
+        updated_at,
+        del_status
+
+        from
+        <if test="isAudit ==false ">
+            auth_role_resource rr
+        </if>
+        <if test="isAudit ==true">
+            auth_role_resource_audit rr
+        </if>
+
+            right join (select ar.id, ar.`level` from auth_resource ar where ar.`level` = 0)r on r.id = rr.resource_id
+        <where>
+            del_status =0
+            <if test="list !=null">
+                and role_id in <foreach collection = 'list' index='index' item='item' open='(' separator=',' close=')'> #{item}</foreach>
+            </if>
+        </where>
+
+    </select>
+
+</mapper>

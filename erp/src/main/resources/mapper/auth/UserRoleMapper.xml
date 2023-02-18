@@ -1,0 +1,38 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.futuremap.erp.module.auth.mapper.UserRoleMapper">
+
+
+    <select id="findList" resultType="com.futuremap.erp.module.auth.entity.UserRole">
+        select
+        id,
+        company_id,
+        user_id,
+        role_id,
+        created_at,
+        del_status
+        from
+        auth_user_role
+        <where>
+            del_status =0
+            <if test="userRole.userId !=null and userRole.userId !=''">
+                and user_id = #{userRole.userId}
+            </if>
+            <if test="userRole.companyId !=null and userRole.companyId !=''">
+                and company_id = #{userRole.companyId}
+            </if>
+        </where>
+    </select>
+
+
+<!--    <select id="getUserIdsByResourceId" resultType="java.lang.Long">-->
+<!--        SELECT-->
+<!--            DISTINCT ar.admin_id-->
+<!--        FROM-->
+<!--            auth_role_resource rr-->
+<!--                LEFT JOIN auth_user_role ar ON rr.role_id = ar.role_id-->
+<!--        WHERE rr.resource_id=#{resourceId}-->
+<!--    </select>-->
+
+
+</mapper>

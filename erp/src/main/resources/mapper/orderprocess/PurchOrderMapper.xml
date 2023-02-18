@@ -1,0 +1,153 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.futuremap.erp.module.orderprocess.mapper.PurchOrderMapper">
+    <resultMap id="resultMap" type="com.futuremap.erp.module.orderprocess.entity.PurchOrder"/>
+    <select id="sum" resultMap="resultMap"
+            parameterType="com.futuremap.erp.module.orderprocess.entity.PurchOrderQuery">
+        SELECT
+        sum(p.`iquantity`) iquantity,
+        sum(p.`isum`) isum,
+        sum(p.`inatsum`) inatsum,
+        sum(iquantity) iquantity,
+        sum(`ireceivedqty`) ireceivedqty,
+        sum(`receivedqty`) receivedqty,
+        sum(`puarr_iquantity`) puarr_iquantity,
+        sum(`refuse_iquantity`) refuse_iquantity
+        FROM
+        purch_order  p
+        <where>
+            <if test="purchOrderQuery.id !=null">
+                and p.id = #{purchOrderQuery.id}
+            </if>
+            <if test="purchOrderQuery.startDate!=null ">
+                and p.dpodate >= #{purchOrderQuery.startDate}
+            </if>
+            <if test="purchOrderQuery.endDate!=null ">
+                <![CDATA[   and p.dpodate < #{purchOrderQuery.endDate}]]>
+            </if>
+            <if test = "purchOrderQuery.csocode!=null and purchOrderQuery.csocode !=''">
+                and p.csocode = #{purchOrderQuery.csocode}
+            </if>
+            <if test = "purchOrderQuery.irowno !=null">
+                and p.irowno = #{purchOrderQuery.irowno}
+            </if>
+            <if test = "purchOrderQuery.cpoid!=null and purchOrderQuery.cpoid !=''">
+                and p.cpoid = #{purchOrderQuery.cpoid}
+            </if>
+            <if test = "purchOrderQuery.cvenName!=null and purchOrderQuery.cvenName !=''">
+                and p.cven_name like  CONCAT("%",#{purchOrderQuery.cvenName},"%")
+            </if>
+            <if test = "purchOrderQuery.cinvcode!=null and purchOrderQuery.cinvcode !=''">
+                and p.cinvcode like  CONCAT("%",#{purchOrderQuery.cinvcode},"%")
+            </if>
+            <if test = "purchOrderQuery.cinvname!=null and purchOrderQuery.cinvname !=''">
+                and p.cinvname like  CONCAT("%",#{purchOrderQuery.cinvname},"%")
+            </if>
+            <if test = "purchOrderQuery.cinvstd!=null and purchOrderQuery.cinvstd !=''">
+                and p.cinvstd like  CONCAT("%",#{purchOrderQuery.cinvstd},"%")
+            </if>
+            <if test="purchOrderQuery.darriveStartDate!=null ">
+                and darrive_date >= #{purchOrderQuery.darriveStartDate}
+            </if>
+            <if test="purchOrderQuery.darriveEndDate!=null ">
+                <![CDATA[   and darrive_date < #{purchOrderQuery.darriveEndDate}]]>
+            </if>
+            <if test="purchOrderQuery.dvouchStartDate!=null ">
+                and dvouch_date >= #{purchOrderQuery.dvouchStartDate}
+            </if>
+            <if test="purchOrderQuery.dvouchEndDate!=null ">
+                <![CDATA[   and dvouch_date < #{purchOrderQuery.dvouchEndDate}]]>
+            </if>
+            <if test = "purchOrderQuery.companyCode !=null">
+                and company_code = #{purchOrderQuery.companyCode}
+            </if>
+
+        </where>
+        order by dpodate desc
+
+
+    </select>
+    <select id="findList" resultMap="resultMap"
+            parameterType="com.futuremap.erp.module.orderprocess.entity.PurchOrderQuery">
+        SELECT
+            p.`id`,
+            p.`dpodate`,
+            p.`company_code`,
+            p.`company_name`,
+            p.`csocode`,
+            p.`irowno`,
+            p.`cpoid`,
+            p.`cven_abbname`,
+            p.`cven_name`,
+            p.`cpersoncode`,
+            p.`cpersonname`,
+            p.`cinvcode`,
+            p.`cinvname`,
+            p.`cinvstd`,
+            p.`cinvm_unit`,
+            p.`iquantity`,
+            p.`cexch_name`,
+            p.`itaxprice`,
+            p.`isum`,
+            p.`inatsum`,
+             iquantity,
+            `ireceivedqty`,
+            `receivedqty`,
+            `darrive_date`,
+            `puarr_iquantity`,
+            `refuse_iquantity`
+        FROM
+           purch_order  p
+        <where>
+            <if test="purchOrderQuery.id !=null">
+                and p.id = #{purchOrderQuery.id}
+            </if>
+            <if test="purchOrderQuery.startDate!=null ">
+                and p.dpodate >= #{purchOrderQuery.startDate}
+            </if>
+            <if test="purchOrderQuery.endDate!=null ">
+                <![CDATA[   and p.dpodate < #{purchOrderQuery.endDate}]]>
+            </if>
+            <if test = "purchOrderQuery.csocode!=null and purchOrderQuery.csocode !=''">
+                and p.csocode = #{purchOrderQuery.csocode}
+            </if>
+            <if test = "purchOrderQuery.irowno !=null">
+                and p.irowno = #{purchOrderQuery.irowno}
+            </if>
+            <if test = "purchOrderQuery.cpoid!=null and purchOrderQuery.cpoid !=''">
+                and p.cpoid = #{purchOrderQuery.cpoid}
+            </if>
+            <if test = "purchOrderQuery.cvenName!=null and purchOrderQuery.cvenName !=''">
+                and p.cven_name like  CONCAT("%",#{purchOrderQuery.cvenName},"%")
+            </if>
+            <if test = "purchOrderQuery.cinvcode!=null and purchOrderQuery.cinvcode !=''">
+                and p.cinvcode like  CONCAT("%",#{purchOrderQuery.cinvcode},"%")
+            </if>
+            <if test = "purchOrderQuery.cinvname!=null and purchOrderQuery.cinvname !=''">
+                and p.cinvname like  CONCAT("%",#{purchOrderQuery.cinvname},"%")
+            </if>
+            <if test = "purchOrderQuery.cinvstd!=null and purchOrderQuery.cinvstd !=''">
+                and p.cinvstd like  CONCAT("%",#{purchOrderQuery.cinvstd},"%")
+            </if>
+            <if test="purchOrderQuery.darriveStartDate!=null ">
+                and darrive_date >= #{purchOrderQuery.darriveStartDate}
+            </if>
+            <if test="purchOrderQuery.darriveEndDate!=null ">
+                <![CDATA[   and darrive_date < #{purchOrderQuery.darriveEndDate}]]>
+            </if>
+            <if test="purchOrderQuery.dvouchStartDate!=null ">
+                and dvouch_date >= #{purchOrderQuery.dvouchStartDate}
+            </if>
+            <if test="purchOrderQuery.dvouchEndDate!=null ">
+                <![CDATA[   and dvouch_date < #{purchOrderQuery.dvouchEndDate}]]>
+            </if>
+            <if test = "purchOrderQuery.companyCode !=null">
+                and company_code = #{purchOrderQuery.companyCode}
+            </if>
+
+        </where>
+            order by dpodate desc
+
+
+    </select>
+</mapper>

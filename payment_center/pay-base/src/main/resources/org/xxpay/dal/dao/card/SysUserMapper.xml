@@ -1,0 +1,79 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="org.xxpay.dal.dao.card.mapper.SysUserMapper" >
+  <resultMap id="sysUserMap" type="org.xxpay.dal.dao.card.model.SysUser" >
+    <id column="USER_ID" property="userId"/>
+    <result column="LOGIN_ACCOUNT" property="loginAccount"/>
+    <result column="MOBILE_PHONE" property="mobliePhone"/>
+    <result column="EMAIL" property="email"/>
+    <result column="LOGIN_PWD" property="loginPwd"/>
+    <result column="PAY_PWD" property="payPwd"/>
+    <result column="USER_TYPE" property="userType"/>
+    <result column="TD_OPEN_ID" property="tdOpenId"/>
+    <result column="USER_REGION" property="userRegion"/>
+    <result column="REGISTER_TIME" property="registerTime"/>
+    <result column="LAST_LOGIN_TIME" property="lastLoginTime"/>
+    <result column="CREATE_TIME" property="createTime"/>
+    <result column="ROLE_ID" property="roleId"/>
+    <result column="MERCHANT_CODE" property="merchantCode"/>
+    <result column="SHOW_COUNT" property="showCount"/>
+    <result column="IS_DELETE" property="is_delete"/>
+    <result column="FLAG" property="flag"/>
+    <result column="STATUS" property="status"/>
+  </resultMap>
+		
+  <!--表名 -->
+  <sql id="tableName">
+	sys_u_user
+  </sql>
+	
+  <!-- 字段 -->
+  <sql id="Field">
+  	USER_ID,
+	LOGIN_ACCOUNT,
+	MOBILE_PHONE,
+	EMAIL,
+	LOGIN_PWD,
+	PAY_PWD,
+	USER_TYPE,
+	TD_OPEN_ID,
+	USER_REGION,
+	REGISTER_TIME,
+	LAST_LOGIN_TIME,
+	CREATE_TIME,
+	ROLE_ID,
+	MERCHANT_CODE,
+	SHOW_COUNT
+  </sql>
+  
+  <insert id="save">
+  	insert into 
+  		<include refid="tableName"></include>
+  	(
+  		USER_ID,LOGIN_ACCOUNT
+  	)
+  	values(
+  		   replace(uuid(),'-',''),#{loginAccount}
+  		   )	
+  </insert>	
+  
+   <select id="infoSysUser" parameterType="String" resultMap="sysUserMap">
+  	select 
+  		*
+  	from <include refid="tableName"></include>
+  	where LOGIN_ACCOUNT = #{loginAccount} and IS_DELETE!=1
+  	
+  </select>
+  
+   <select id="info" parameterType="String" resultMap="sysUserMap">
+  	select 
+  		*
+  	from <include refid="tableName"></include>
+  	<where>
+		<if test="userId != null and userId != ''">
+			USER_ID = #{userId} and IS_DELETE!=1
+		</if>
+  	</where>
+  </select>
+  
+</mapper>

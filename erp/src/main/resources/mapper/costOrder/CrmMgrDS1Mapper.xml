@@ -1,0 +1,266 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.futuremap.erp.module.orderCost.mapper.CrmMgrDS1Mapper">
+    <resultMap id="crmMgr" type="com.futuremap.erp.module.orderCost.entity.CrmMgr"/>
+
+    <select id="getOuterCrmMgrListByTime" resultMap="crmMgr" parameterType="string">
+        select
+            ddate,
+            ccode as order_detail_code,
+            irowno as order_number,
+            cinvcode as product_code,
+            cinvname product_name,
+            cdepcode as cdep_code,
+            cdepname as cdep_name,
+            fquantity,
+            ccuscode as customer_code,
+            ccusname as customer_name,
+            0 as order_src,
+            ftaxmoney as order_value
+        from v_ex_orderlist
+        WHERE
+            ddate &gt;= #{startDate} AND ddate &lt;= #{endDate}
+    </select>
+    <select id="getOuterCrmMgrListByTime0001" resultMap="crmMgr" parameterType="string">
+        SELECT
+            a.darverifierdate as ddate,
+            a.cdemandcode as order_detail_code,
+            a.idemandseq as order_number,
+            a.cinvcode as product_code,
+            a.cinvname product_name,
+            a.ccusCode as customer_code,
+            a.ccusName as customer_name,
+            a.cdepname as cdep_code,
+            a.cdepCode as cdep_name,
+            a.fquantity,
+            a.fnattaxmoney as order_value,
+            0 as order_src
+        FROM
+            v_ex_invoicelist a
+        WHERE
+            a.iverifystate=2
+            and a.fquantity>0
+            and a.cdemandcode is not null
+            and a.darverifierdate &gt;= #{startDate}
+            and a.darverifierdate &lt;= #{endDate}
+            and a.ccusCode not in('HD154', 'W0001', 'HD151','EASI001','9999')
+    </select>
+    <select id="getOuterCrmMgrOne" resultMap="crmMgr" parameterType="string">
+        SELECT
+            top 1
+            a.darverifierdate as ddate,
+            a.cdemandcode as order_detail_code,
+            a.idemandseq as order_number,
+            a.cinvcode as product_code,
+            a.cinvname product_name,
+            a.ccusCode as customer_code,
+            a.ccusName as customer_name,
+            a.cdepname as cdep_name,
+            a.cdepCode as cdep_code,
+            a.fquantity,
+            a.fnattaxmoney as order_value,
+            0 as order_src
+        FROM
+            v_ex_invoicelist a
+        WHERE
+            a.iverifystate=2
+            and a.fquantity>0
+            and a.cdemandcode is not null
+            and a.cdemandcode= #{orderDetailCode}
+            and a.idemandseq= #{orderNumber}
+            and a.cinvcode= #{productCode}
+            and a.ccusCode not in('HD154', 'W0001', 'HD151','EASI001','9999')
+    </select>
+    <select id="getInnerCrmMgrListByTime" resultMap="crmMgr" parameterType="string">
+        SELECT
+            ddate,
+            csocode as order_detail_code,
+            irowno as order_number,
+            cdepcode as cdep_code,
+            cdepname as cdep_name,
+            cinvcode as product_code,
+            cinvname as product_name,
+            ccuscode as customer_code,
+            ccusname as customer_name,
+            iquantity as fquantity,
+            1 as order_src,
+            inatsum  as order_value
+        FROM
+            SaleOrderQ INNER JOIN SaleOrderSQ ON SaleOrderQ.id = SaleOrderSQ.id
+        WHERE
+            ddate &gt;= #{startDate} AND ddate &lt;= #{endDate}
+    </select>
+    <select id="getInnerCrmMgrListByTime0001" resultMap="crmMgr" parameterType="string">
+        SELECT
+            dArverifydate as ddate,
+            cdemandcode as orderDetailCode,
+            iorderrowno as orderNumber,
+            iquantity as fquantity,
+            cinvcode as product_code,
+            cinvname as product_name,
+            ccusCode as customer_code,
+            ccusName as customer_name,
+            cdepname as cdep_code,
+            cdepCode as cdep_name,
+            inatsum as order_value,
+            1 as order_src
+        FROM
+            SaleBillVouchZT inner join SaleBillVouchZW on SaleBillVouchZT.sbvid=SaleBillVouchZW.sbvid
+        WHERE
+            cdemandcode is not null
+            and (cVouchType = 26 OR cVouchType = 27)
+            and dArverifydate &gt;= #{startDate}
+            and dArverifydate &lt;= #{endDate}
+            and SaleBillVouchZT.ccusCode not in('HD154', 'W0001', 'HD151','EASI001','9999')
+    </select>
+    <select id="getInnerCrmMgrOne" resultMap="crmMgr" parameterType="string">
+        SELECT
+            top 1
+            dArverifydate as ddate,
+            cdemandcode as orderDetailCode,
+            iorderrowno as orderNumber,
+            iquantity as fquantity,
+            cinvcode as productCode,
+            cinvname as productName,
+            ccusCode as customerCode,
+            ccusName as customerName,
+            cdepname as cdepName,
+            cdepCode as cdepCode,
+            inatsum as orderValue,
+            1 as order_src
+        FROM
+            SaleBillVouchZT inner join SaleBillVouchZW on SaleBillVouchZT.sbvid=SaleBillVouchZW.sbvid
+        WHERE
+            (cVouchType = 26 OR cVouchType = 27)
+            and cdemandcode=#{orderDetailCode}
+            and iorderrowno=#{orderNumber}
+            and cinvcode=#{productCode}
+            and SaleBillVouchZT.ccusCode not in('HD154', 'W0001', 'HD151','EASI001','9999')
+    </select>
+
+
+    <select id="getCrmMgrList" resultMap="crmMgr" parameterType="com.futuremap.erp.module.orderCost.entity.CrmMgrQuery">
+        SELECT
+        *
+        FROM
+        crm_mgr
+        <where>
+            <if test="crmMgrQuery.orderDetailCode !=null">
+                and a.order_detail_code = #{crmMgrQuery.orderDetailCode}
+            </if>
+            <if test="crmMgrQuery.orderNumber !=null">
+                and a.order_number = #{crmMgrQuery.orderNumber}
+            </if>
+            <if test="crmMgrQuery.productCode !=null">
+                and a.product_code = #{crmMgrQuery.productCode}
+            </if>
+            <if test="crmMgrQuery.customerCode !=null">
+                and a.customer_code = #{crmMgrQuery.customerCode}
+            </if>
+            <if test="crmMgrQuery.companyCode !=null">
+                and a.company_code = #{crmMgrQuery.companyCode}
+            </if>
+            <if test="crmMgrQuery.ddate1 !=null and crmMgrQuery.ddate2 !=null">
+                and a.ddate &gt; = #{crmMgrQuery.ddate1} and a.ddate &lt; = #{crmMgrQuery.ddate2}
+            </if>
+            <if test="crmMgrQuery.ddate1 !=null and crmMgrQuery.ddate2 ==null">
+                and a.ddate &gt; = #{crmMgrQuery.ddate1}
+            </if>
+            <if test="crmMgrQuery.ddate1 ==null and crmMgrQuery.ddate2 !=null">
+                and a.ddate &lt; = #{crmMgrQuery.ddate2}
+            </if>
+
+
+            <if test="crmMgrQuery.orderValue1 !=null and crmMgrQuery.orderValue2 !=null">
+                and a.order_value &gt; = #{crmMgrQuery.orderValue1} and a.order_value &lt; = #{crmMgrQuery.orderValue2}
+            </if>
+            <if test="crmMgrQuery.orderValue1 !=null and crmMgrQuery.orderValue2 ==null">
+                and a.order_value &gt; = #{crmMgrQuery.orderValue1}
+            </if>
+            <if test="crmMgrQuery.orderValue1 ==null and crmMgrQuery.orderValue2 !=null">
+              and a.order_value &lt; = #{crmMgrQuery.orderValue2}
+            </if>
+
+            <if test="crmMgrQuery.profitRate1 !=null and crmMgrQuery.profitRate2 !=null">
+                and a.profit_rate &gt; = #{crmMgrQuery.profitRate1} and a.profit_rate &lt; = #{crmMgrQuery.profitRate2}
+            </if>
+            <if test="crmMgrQuery.profitRate1 !=null and crmMgrQuery.profitRate2 ==null">
+                and a.profit_rate &gt; = #{crmMgrQuery.profitRate1}
+            </if>
+            <if test="crmMgrQuery.profitRate1 ==null and crmMgrQuery.profitRate2 !=null">
+               and a.profit_rate &lt; = #{crmMgrQuery.profitRate2}
+            </if>
+        </where>
+
+    </select>
+
+
+    <select id="getFromBill" resultMap="crmMgr" parameterType="string">
+
+        SELECT
+        ccus_name AS customerName,
+        ccus_code AS customerCode,
+        company_name AS companyName,
+        conlection_money AS returnAmount,
+        dvouch_date AS returnDate
+
+        FROM sale_bill
+        WHERE bill_code=#{invoiceId} AND csocode=#{orderDetailCode} AND cinvcode=#{productCode} AND
+        irowno=#{orderNumber}
+    </select>
+
+
+    <select id="findList" resultMap="crmMgr" parameterType="com.futuremap.erp.module.orderCost.entity.CrmMgrQuery">
+        select ${crmMgrQuery.columnVisit} from crm_mgr a
+        <where>
+            <if test="crmMgrQuery.companyCode !=null">
+                and a.company_code = #{crmMgrQuery.companyCode}
+            </if>
+            <if test="crmMgrQuery.orderDetailCode !=null">
+                and a.order_detail_code = #{crmMgrQuery.orderDetailCode}
+            </if>
+
+            <if test="crmMgrQuery.customerCode !=null">
+                and a.customer_code = #{crmMgrQuery.customerCode}
+            </if>
+
+            <if test="crmMgrQuery.productCode !=null">
+                and a.product_code = #{crmMgrQuery.productCode}
+            </if>
+
+            <if test="crmMgrQuery.ddate1 !=null and crmMgrQuery.ddate2 !=null">
+                and a.ddate &gt;= #{crmMgrQuery.ddate1} and a.ddate &lt;=#{crmMgrQuery.ddate2}
+            </if>
+            <if test="crmMgrQuery.ddate1 !=null and crmMgrQuery.ddate2 ==null">
+                and a.ddate &gt;= #{crmMgrQuery.ddate1}
+            </if>
+            <if test="crmMgrQuery.ddate1 ==null and crmMgrQuery.ddate2 !=null">
+                and a.ddate &lt;=#{crmMgrQuery.ddate2}
+            </if>
+
+
+            <if test="crmMgrQuery.orderValue1 !=null and crmMgrQuery.orderValue2 !=null">
+                and a.order_value &gt;= #{crmMgrQuery.orderValue1} and a.order_value &lt;=#{crmMgrQuery.orderValue2}
+            </if>
+            <if test="crmMgrQuery.orderValue1 !=null and crmMgrQuery.orderValue2 ==null">
+                and a.order_value &gt;= #{crmMgrQuery.orderValue1}
+            </if>
+            <if test="crmMgrQuery.orderValue1 ==null and crmMgrQuery.orderValue2 !=null">
+                and a.order_value &lt;=#{crmMgrQuery.orderValue2}
+            </if>
+
+
+            <if test="crmMgrQuery.profitRate1 !=null and crmMgrQuery.profitRate2 !=null">
+                and a.profit_rate &gt;= #{crmMgrQuery.profitRate1} and a.profit_rate &lt;=#{crmMgrQuery.profitRate2}
+            </if>
+            <if test="crmMgrQuery.profitRate1 !=null and crmMgrQuery.profitRate2 ==null">
+                and a.profit_rate &gt;= #{crmMgrQuery.profitRate1}
+            </if>
+            <if test="crmMgrQuery.profitRate1 ==null and crmMgrQuery.profitRate2 !=null">
+                and a.profit_rate &lt;=#{crmMgrQuery.profitRate2}
+            </if>
+
+        </where>
+        order by a.create_time desc
+    </select>
+</mapper>

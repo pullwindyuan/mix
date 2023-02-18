@@ -1,0 +1,183 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.futuremap.erp.module.orderCost.mapper.SaleKpiDS1Mapper">
+    <resultMap id="saleKpi" type="com.futuremap.erp.module.orderCost.entity.SaleKpi"/>
+
+    <select id="getSaleKpiListByTime" resultMap="saleKpi" parameterType="string">
+        SELECT
+            ddate,
+            ccode as order_detail_code,
+            irowno as order_number,
+            cinvcode as product_code,
+            cinvname product_name,
+            cpersoncode as sale_code,
+            cpersonname as sale_name,
+            cdepcode as cdep_code,
+            cdepname as cdep_name,
+            ccuscode as customer_code,
+            ccusname as customer_name,
+            fexchrate as exchange_rate,
+            ftaxmoney as order_value
+        FROM
+            v_ex_orderlist
+        WHERE
+            ddate &gt;= #{startDate} AND ddate &lt;= #{endDate} and  ccuscode not in('HD154', 'W0001', 'HD151','EASI001','9999') AND ccode is not null;
+    </select>
+    <select id="getSaleKpiListByTime0001" resultMap="saleKpi" parameterType="string">
+        SELECT
+            darverifierdate as ddate,
+            cdemandcode as order_detail_code,
+            idemandseq as order_number,
+            cinvcode as product_code,
+            cinvname product_name,
+            ccusCode as customer_code,
+            ccusName as customer_name,
+            cdepname as cdep_code,
+            cdepCode as cdep_name,
+            fexchrate as exchange_rate,
+            cpersoncode as sale_code,
+            cpersonname as sale_name,
+            fnattaxmoney as order_value
+        FROM
+            v_ex_invoicelist
+        WHERE
+            iverifystate=2
+            and fquantity>0
+            and cdemandcode is not null
+            and darverifierdate &gt;= #{startDate}
+            and darverifierdate &lt;= #{endDate}
+            and ccusCode not in('HD154', 'W0001', 'HD151','EASI001','9999')
+    </select>
+    <select id="getSaleKpiOne" resultMap="saleKpi" parameterType="string">
+        SELECT
+            top 1
+            darverifierdate as ddate,
+            cdemandcode as order_detail_code,
+            idemandseq as order_number,
+            cinvcode as product_code,
+            cinvname product_name,
+            ccusCode as customer_code,
+            ccusName as customer_name,
+            cdepname as cdep_code,
+            cdepCode as cdep_name,
+            fexchrate as exchange_rate,
+            cpersoncode as sale_code,
+            cpersonname as sale_name,
+            fnattaxmoney as order_value
+        FROM
+            v_ex_invoicelist
+        WHERE
+            iverifystate=2
+            and fquantity>0
+            and cdemandcode is not null
+            and ccusCode not in('HD154', 'W0001', 'HD151','EASI001','9999')
+            and cdemandcode=#{ccode}
+            and idemandseq=#{irowno}
+            and cinvcode=#{cinvcode}
+    </select>
+    <select id="getSaleKpiByTr" resultMap="saleKpi" parameterType="string">
+        SELECT
+            top 1
+            cpersoncode as sale_code,
+            cpersonname as sale_name,
+            cdepcode as cdep_code,
+            cdepname as cdep_name,
+            ccuscode as customer_code,
+            ccusname as customer_name,
+            fexchrate as exchange_rate,
+            ftaxmoney as order_value
+        FROM
+            v_ex_orderlist
+        WHERE
+            ccode=#{ccode} and irowno=#{irowno} and cinvcode=#{cinvcode}
+    </select>
+
+
+
+
+
+
+    <select id="findList" resultMap="saleKpi" parameterType="com.futuremap.erp.module.orderCost.entity.SaleKpiQuery">
+        select ${saleKpiQuery.columnVisit} from sale_kpi a
+        <where>
+
+            <if test="saleKpiQuery.productCode !=null">
+                and a.product_code = #{saleKpiQuery.productCode}
+            </if>
+            <if test="saleKpiQuery.companyCode !=null">
+                and a.company_code = #{saleKpiQuery.companyCode}
+            </if>
+            <if test="saleKpiQuery.orderDetailCode !=null">
+                and a.order_detail_code = #{saleKpiQuery.orderDetailCode}
+            </if>
+            <if test="saleKpiQuery.orderNumber !=null">
+                and a.order_number = #{saleKpiQuery.orderNumber}
+            </if>
+            <if test="saleKpiQuery.productCode !=null">
+                and a.product_code = #{saleKpiQuery.productCode}
+            </if>
+            <if test="saleKpiQuery.companyCode !=null">
+                and a.company_code = #{saleKpiQuery.companyCode}
+            </if>
+            <if test="saleKpiQuery.saleCode !=null">
+                and a.sale_code = #{saleKpiQuery.saleCode}
+            </if>
+            <if test="saleKpiQuery.ddate1 !=null and saleKpiQuery.ddate2 !=null">
+                and a.ddate &gt;= #{saleKpiQuery.ddate1} and a.ddate &lt;=#{saleKpiQuery.ddate2}
+            </if>
+            <if test="saleKpiQuery.ddate1 !=null and saleKpiQuery.ddate2 ==null">
+                and a.ddate &gt;= #{saleKpiQuery.ddate1}
+            </if>
+            <if test="saleKpiQuery.ddate1 ==null and saleKpiQuery.ddate2 !=null">
+                and a.ddate &lt;=#{saleKpiQuery.ddate2}
+            </if>
+
+
+            <if test="saleKpiQuery.orderValue1 !=null and saleKpiQuery.orderValue2 !=null">
+                and a.order_value &gt;= #{saleKpiQuery.orderValue1} and a.order_value &lt;=#{saleKpiQuery.orderValue2}
+            </if>
+            <if test="saleKpiQuery.orderValue1 !=null and saleKpiQuery.orderValue2 ==null">
+                and a.order_value &gt;= #{saleKpiQuery.orderValue1}
+            </if>
+            <if test="saleKpiQuery.orderValue1 ==null and saleKpiQuery.orderValue2 !=null">
+                and a.order_value &lt;=#{saleKpiQuery.orderValue2}
+            </if>
+
+
+            <if test="saleKpiQuery.retainedProfit1 !=null and saleKpiQuery.retainedProfit2 !=null">
+                and a.retained_profit &gt;= #{saleKpiQuery.retainedProfit1} and a.retained_profit &lt;=#{saleKpiQuery.retainedProfit2}
+            </if>
+            <if test="saleKpiQuery.retainedProfit1 !=null and saleKpiQuery.retainedProfit2 ==null">
+                and a.retained_profit &gt;= #{saleKpiQuery.retainedProfit1}
+            </if>
+            <if test="saleKpiQuery.retainedProfit1 ==null and saleKpiQuery.retainedProfit2 !=null">
+                and a.retained_profit &lt;=#{saleKpiQuery.retainedProfit2}
+            </if>
+
+
+            <if test="saleKpiQuery.profitAmount1 !=null and saleKpiQuery.profitAmount2 !=null">
+                and a.profit_amount &gt;= #{saleKpiQuery.profitAmount1} and a.profit_amount &lt;=#{saleKpiQuery.profitAmount2}
+            </if>
+            <if test="saleKpiQuery.profitAmount1 !=null and saleKpiQuery.profitAmount2 ==null">
+                and a.profit_amount &gt;= #{saleKpiQuery.profitAmount1}
+            </if>
+            <if test="saleKpiQuery.profitAmount1 ==null and saleKpiQuery.profitAmount2 !=null">
+                and a.profit_amount &lt;=#{saleKpiQuery.profitAmount2}
+            </if>
+
+
+
+            <if test="saleKpiQuery.profitRate1 !=null and saleKpiQuery.profitRate2 !=null">
+                and a.profit_rate &gt;= #{saleKpiQuery.profitRate1} and a.profit_rate &lt;=#{saleKpiQuery.profitRate2}
+            </if>
+            <if test="saleKpiQuery.profitRate1 !=null and saleKpiQuery.profitRate2 ==null">
+                and a.profit_rate &gt;= #{saleKpiQuery.profitRate1}
+            </if>
+            <if test="saleKpiQuery.profitRate1 ==null and saleKpiQuery.profitRate2 !=null">
+                and a.profit_rate &lt;=#{saleKpiQuery.profitRate2}
+            </if>
+        </where>
+        order by a.create_time desc
+    </select>
+
+</mapper>

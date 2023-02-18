@@ -1,0 +1,93 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.futuremap.erp.module.auth.mapper.RoleMapper">
+
+    <select id="findList" resultType="com.futuremap.erp.module.auth.entity.Role">
+        select
+        id,
+        role_name,
+        role_desc,
+        detail,
+        created_at,
+        del_status
+        from
+        auth_role
+        <where>
+            del_status =0
+            <if test="role.id !=null and role.id !=''">
+                and id = #{role.id}
+            </if>
+            <if test="role.roleName !=null and role.roleName !=''">
+                and role_name like  CONCAT("%",#{role.roleName},"%")
+            </if>
+        </where>
+
+    </select>
+
+    <select id="findAuditList" resultType="com.futuremap.erp.module.auth.entity.Role">
+        select
+        id,
+        role_name,
+        role_desc,
+        detail,
+        created_at,
+        del_status
+        from
+        auth_role ar
+            right join (select role_id from auth_role_resource_audit) ra on ra.role_id = ar.id
+        <where>
+            del_status =0
+            <if test="role.id !=null and role.id !=''">
+                and id = #{role.id}
+            </if>
+            <if test="role.roleName !=null and role.roleName !=''">
+                and role_name like  CONCAT("%",#{role.roleName},"%")
+            </if>
+        </where>
+
+    </select>
+
+    <delete id="updatePermission">
+        DELETE FROM auth_role_column_audit where role_id = #{roleId};
+        DELETE FROM auth_role_resource_audit where role_id = #{roleId};
+        <if test="roleColumnList !=null and roleColumnList.size() > 0">
+        insert into auth_role_column_audit(column_id,role_id,role_name)
+        values
+        <foreach collection="roleColumnList" item="item" index="index" separator=",">
+            (#{item.columnId},#{item.roleId},#{item.roleName})
+        </foreach>
+        ;
+        </if>
+        <if test="roleResourceList !=null and roleResourceList.size() > 0">
+        insert into auth_role_resource_audit(resource_id,role_id,role_name)
+        values
+        <foreach collection="roleResourceList" item="item" index="index" separator=",">
+            (#{item.resourceId},#{item.roleId},#{item.roleName})
+        </foreach>
+        ;
+        </if>
+    </delete>
+
+    <delete id="auditPermission">
+        DELETE FROM auth_role_column where role_id = #{roleId};
+        DELETE FROM auth_role_resource where role_id = #{roleId};
+        <if test="roleColumnList !=null and roleColumnList.size() > 0">
+            insert into auth_role_column(column_id,role_id,role_name)
+            values
+            <foreach collection="roleColumnList" item="item" index="index" separator=",">
+                (#{item.columnId},#{item.roleId},#{item.roleName})
+            </foreach>
+            ;
+        </if>
+        <if test="roleResourceList !=null and roleResourceList.size() > 0">
+            insert into auth_role_resource(resource_id,role_id,role_name)
+            values
+            <foreach collection="roleResourceList" item="item" index="index" separator=",">
+                (#{item.resourceId},#{item.roleId},#{item.roleName})
+            </foreach>
+            ;
+        </if>
+        DELETE FROM auth_role_column_audit where role_id = #{roleId};
+        DELETE FROM auth_role_resource_audit where role_id = #{roleId};
+    </delete>
+</mapper>

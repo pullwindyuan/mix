@@ -1,0 +1,71 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.futuremap.erp.module.auth.mapper.RoleColumnMapper">
+    <select id="findList" resultType="com.futuremap.erp.module.auth.entity.RoleColumn">
+        select
+        arc.id,
+        column_id,
+        role_id,
+        role_name,
+        ac.`table_name`,
+        ac.`column_filed`,
+        ac.`column_name`,
+        created_by,
+        created_at,
+        updated_by,
+        updated_at,
+        del_status
+
+        from
+        auth_role_column arc
+        left join (select c.id,`table_name`,`column_filed`,`column_name` from auth_column c) ac on ac.id = arc.column_id
+        <where>
+            del_status =0
+            <if test="roleColumn.id !=null and roleColumn.id !=''">
+                and id = #{roleColumn.id}
+            </if>
+            <if test="roleColumn.roleId !=null and roleColumn.roleId !=''">
+                and role_id = #{roleColumn.roleId}
+            </if>
+            <if test="roleColumn.columnId !=null and roleColumn.columnId !=''">
+                and column_id = #{roleColumn.columnId}
+            </if>
+            <if test="roleColumn.roleName !=null and roleColumn.roleName !=''">
+                and `role_name` like  CONCAT("%",#{roleColumn.roleName},"%")
+            </if>
+        </where>
+
+    </select>
+
+    <select id="findListByRoleIds" resultType="com.futuremap.erp.module.auth.entity.RoleColumn">
+        select
+        arc.id,
+        column_id,
+        role_id,
+        role_name,
+        ac.`table_name`,
+        ac.`column_filed`,
+        ac.`column_name`,
+        created_by,
+        created_at,
+        updated_by,
+        updated_at,
+        del_status
+
+        from
+        <if test="isAudit ==false">
+            auth_role_column arc
+        </if>
+        <if test="isAudit ==true">
+            auth_role_column_audit arc
+        </if>
+        left join (select c.id,`table_name`,`column_filed`,`column_name` from auth_column c) ac on ac.id = arc.column_id
+        <where>
+            del_status =0
+            <if test="list !=null">
+                and role_id in <foreach collection = 'list' index='index' item='item' open='(' separator=',' close=')'> #{item}</foreach>
+            </if>
+        </where>
+
+    </select>
+</mapper>

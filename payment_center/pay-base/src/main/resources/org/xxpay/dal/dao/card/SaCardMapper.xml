@@ -1,0 +1,457 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="org.xxpay.dal.dao.card.mapper.SaCardMapper" >
+  <resultMap id="saCardMap" type="org.xxpay.dal.dao.card.model.SaCard" >
+    <id column="CARD_ID" property="cardId"/>
+    <result column="CARD_NUMBER" property="cardNumber"/>
+    <result column="CONFIG_NUMBER" property="configNumber"/>
+    <result column="LOGIN_ACCOUNT" property="loginAccount"/>
+    <result column="REMAIN_PART" property="remainPart"/>
+    <result column="FREEZE_PART" property="freezePart"/>
+    <result column="CARD_STATUS" property="cardStatus"/>
+    <result column="CREATE_TIME" property="createTime"/>
+    <result column="USER_NAME" property="userName"/>
+    <result column="USER_ID" property="userId"/>
+    <result column="IS_DELETE" property="isDelete"/>
+    <result column="FLAG" property="flag"/>
+    <result column="CARD_TYPE" property="cardType"/>
+    <result column="CARD_LIMIT" property="cardLimit"/>
+    <result column="CARD_NAME" property="cardName"/>
+    <result column="NOT_BILL" property="notBill"/>
+  </resultMap>
+  
+  <!--表名 -->
+  <sql id="tableName">
+	sa_card
+  </sql>
+	
+  <!-- 字段 -->
+  <sql id="Field">
+  	CARD_ID,
+	CARD_NUMBER,
+	CONFIG_NUMBER,
+	LOGIN_ACCOUNT,
+	CREATE_TIME,
+	USER_NAME,
+	USER_ID
+  </sql>
+  
+  <sql id="FieldValue">
+  	replace(uuid(),'-',''),
+  	#{cardNumber},
+  	#{configNumber},
+  	#{loginAccount},
+	now(),
+  	#{userName},
+  	#{userId}
+  </sql>
+  
+  <sql id="selectValue">
+  	CARD_ID,
+	CARD_NUMBER,
+	CARD_TYPE,
+	CARD_NAME,
+	CONFIG_NUMBER,
+	LOGIN_ACCOUNT,
+	DATE_FORMAT(CREATE_TIME,'%Y-%m-%d %T')AS CREATE_TIME,
+	REMAIN_PART,
+	FREEZE_PART,
+	USER_NAME,
+	USER_ID,
+	CASE 
+	    WHEN CARD_STATUS='0' THEN '禁用' 
+	    WHEN CARD_STATUS='1' THEN '正常' 
+    END AS CARD_STATUS
+  </sql>
+  
+  <sql id="select_where_clause">
+  	<if test="userId != null">
+  		and USER_ID=#{userId}
+  	</if>
+  	<if test="createTime != null and endTime != null">
+		and CREATE_TIME<![CDATA[ >= ]]>#{createTime} and CREATE_TIME <![CDATA[ <= ]]> #{endTime}
+  	</if>
+  	<if test="loginAccount != null and loginAccount != ''">
+		and LOGIN_ACCOUNT = #{loginAccount}
+  	</if>
+  	<if test="userName != null and userName != ''">
+  		and USER_NAME = #{userName}
+  	</if>
+  	<if test="cardType != null and cardType != ''">
+  		and CARD_TYPE = #{cardType}
+  	</if>
+  	<if test="cardName != null and cardName != ''">
+  		and CARD_NAME = #{cardName}
+  	</if>
+  </sql>
+  
+  <insert id="addSaCard">
+  	insert into
+		<include refid="tableName"></include>
+		(
+			CARD_ID,
+			CARD_NUMBER,
+			CARD_TYPE,
+			CARD_NAME,
+			CONFIG_NUMBER,
+			LOGIN_ACCOUNT,
+			CREATE_TIME,
+			USER_NAME,
+			USER_ID,
+			FLAG
+		) 
+		values 
+		<foreach collection="list" item="item" separator=",">
+			(replace(uuid(),'-',''),
+		  	#{item.cardNumber},
+		  	#{item.cardType},
+		  	#{item.cardName},
+		  	#{item.configNumber},
+		  	#{item.loginAccount},
+			now(),
+		  	#{item.userName},
+		  	#{item.userId},
+		  	#{item.flag})
+		</foreach>	
+  </insert>
+  
+  <insert id="baseInsert">
+	insert into
+		<include refid="tableName"></include>
+		(
+			<include refid="Field"></include>
+		) 
+		values 
+		(
+			<include refid="FieldValue"></include>
+		)
+  </insert>
+  
+  <update id="updateFreeze">
+  	update <include refid="tableName"></include>
+  	set
+  		<if test="flag == '0'">
+  			REMAIN_PART=REMAIN_PART - #{freezePart},
+  			FREEZE_PART=FREEZE_PART + #{freezePart},
+  		</if>
+  		<if test="flag == '1'">
+  			REMAIN_PART=REMAIN_PART + #{freezePart},
+  			FREEZE_PART=FREEZE_PART - #{freezePart},
+  		</if>
+  		CARD_ID=CARD_ID
+  	where 1=1
+  		<if test="userId != null and userId != ''">
+  			and USER_ID=#{userId}
+  		</if>
+  		<if test="cardType != null and cardType != ''">
+  			and CARD_TYPE=#{cardType}
+  		</if>
+  		<if test="cardNumber != null and cardNumber != ''">
+  			and CARD_NUMBER=#{cardNumber}	
+  		</if>		
+  </update>
+  
+  <update id="updateData" parameterType="org.xxpay.dal.dao.card.model.SaCard">
+  	update <include refid="tableName"></include>
+  	set 
+  		<if test="cardLimit != null and flag == '1'">
+  			CARD_LIMIT=CARD_LIMIT+#{cardLimit},
+  		</if>
+  		<if test="cardLimit != null and flag == '0'">
+  			CARD_LIMIT=CARD_LIMIT-#{cardLimit},
+  		</if>
+  		CARD_ID=CARD_ID
+  		where 1=1 
+  		<if test="userId != null and userId != ''">
+  			and USER_ID=#{userId}
+  		</if>
+  		<if test="cardType != null and cardType != ''">
+  			and CARD_TYPE=#{cardType}
+  		</if>
+  		<if test="cardNumber != null and cardNumber != ''">
+  			and CARD_NUMBER=#{cardNumber}	
+  		</if>
+  </update>
+  
+   <select id="baseLimitSelect" resultMap="saCardMap">
+		select
+			<include refid="selectValue"></include>
+		from <include refid="tableName"></include>
+		where 1=1
+		<include refid="select_where_clause"></include>
+   </select>
+  
+   <update id="updateCard" parameterType="org.xxpay.dal.dao.card.model.SaCard">
+  	update <include refid="tableName"></include>
+  	set 
+  		<choose>
+  			<when test="cardNumber == '40006tX6DC6r'">
+  				<if test="freezePart != null and flag == '0'">
+		  			FREEZE_PART=FREEZE_PART-#{freezePart},
+		  		</if>
+		  		<if test="freezePart != null and flag == '1'">
+		  			REMAIN_PART=REMAIN_PART-#{freezePart},
+		  			<!-- FREEZE_PART=FREEZE_PART+#{freezePart}, -->
+		  		</if>
+		  		<if test="freezePart != null and flag == '2'">
+		  			REMAIN_PART=REMAIN_PART+#{freezePart},
+		  			FREEZE_PART=FREEZE_PART-#{freezePart},
+		  		</if>
+  			</when>
+  			<otherwise>
+  				<if test="freezePart != null">
+		  			REMAIN_PART=REMAIN_PART+#{freezePart},
+		  			FREEZE_PART=FREEZE_PART-#{freezePart},
+		  		</if>
+		  		<if test="notBill != null">
+		  			REMAIN_PART=REMAIN_PART+#{notBill},
+		  			NOT_BILL=NOT_BILL-#{notBill},
+		  		</if>
+  			</otherwise>
+  		</choose>
+  		CARD_ID=CARD_ID
+	where CARD_NUMBER=#{cardNumber} 
+  </update>
+
+<update id="updateCardList" parameterType="java.util.List">
+	<foreach collection="list" item="item" index="index" open="" close="" separator=";">
+		update <include refid="tableName"></include>
+		set
+			<if test="item.freezePart != null">
+				REMAIN_PART=REMAIN_PART+#{item.freezePart},
+				FREEZE_PART=FREEZE_PART-#{item.freezePart},
+			</if>
+			<if test="item.flag == '1' and item.notBill != null">
+				REMAIN_PART=REMAIN_PART+#{item.notBill},
+				NOT_BILL=NOT_BILL-#{item.notBill},
+			</if>
+			<if test="item.flag == '0' and item.notBill != null">
+				NOT_BILL=NOT_BILL-#{item.notBill},
+			</if>
+			<if test="item.flag == '0' and item.remainPart != null">
+				REMAIN_PART=REMAIN_PART-#{item.remainPart},
+			</if>
+		CARD_ID=CARD_ID
+		where CARD_NUMBER=#{item.cardNumber}
+	</foreach>
+</update>
+
+  <update id="baseUpdate" parameterType="org.xxpay.dal.dao.card.model.SaCard">
+  	update <include refid="tableName"></include>
+  	set
+  		<choose>
+  			<when test="flag == '0' and freezePart != null">
+  				FREEZE_PART=FREEZE_PART-#{freezePart},
+  			</when>
+  			<when test="flag == '1' and freezePart != null">
+  				FREEZE_PART=FREEZE_PART+#{freezePart},
+  			</when>
+  			<when test="flag == '0' and remainPart != null">
+  				REMAIN_PART=REMAIN_PART-#{remainPart},
+  			</when>
+  			<when test="flag == '1' and remainPart != null">
+  				REMAIN_PART=REMAIN_PART+#{remainPart},
+  			</when>
+  			<when test="flag == '0' and notBill != null">
+  				NOT_BILL=NOT_BILL-#{notBill},
+  			</when>
+  			<when test="flag == '1' and notBill != null">
+  				NOT_BILL=NOT_BILL+#{notBill},
+  			</when>
+  		</choose>
+  		CARD_ID=CARD_ID
+	where CARD_NUMBER=#{cardNumber} 
+  </update>
+
+<update id="baseUpdateList" parameterType="java.util.List">
+	<foreach collection="list" item="item" index="index" open="" close="" separator=";">
+		update <include refid="tableName"></include>
+		set
+		<choose>
+			<when test="item.flag == '0' and item.freezePart != null">
+				FREEZE_PART=FREEZE_PART-#{item.freezePart},
+			</when>
+			<when test="item.flag == '1' and item.freezePart != null">
+				FREEZE_PART=FREEZE_PART+#{item.freezePart},
+			</when>
+			<when test="item.flag == '0' and item.remainPart != null">
+				REMAIN_PART=REMAIN_PART-#{item.remainPart},
+			</when>
+			<when test="item.flag == '1' and item.remainPart != null">
+				REMAIN_PART=REMAIN_PART+#{item.remainPart},
+			</when>
+			<when test="item.flag == '0' and item.notBill != null">
+				NOT_BILL=NOT_BILL-#{item.notBill},
+			</when>
+			<when test="item.flag == '1' and item.notBill != null">
+				NOT_BILL=NOT_BILL+#{item.notBill},
+			</when>
+		</choose>
+		CARD_ID=CARD_ID
+		where CARD_NUMBER=#{item.cardNumber}
+	</foreach>
+</update>
+
+  <select id="baseInfo" resultMap="saCardMap">
+	select
+		*
+	from <include refid="tableName"></include>
+	where 1=1 
+	<if test="userId != null">
+  		and USER_ID=#{userId}
+  	</if>
+  	<if test="cardNumber != null">
+  		and CARD_NUMBER=#{cardNumber}
+  	</if>
+  	<if test="cardType != null">
+  		and CARD_TYPE=#{cardType}
+  	</if>
+  </select>
+  
+  <select id="getSaCardInfoByAccount" parameterType="org.xxpay.dal.dao.card.model.SaCard" resultMap="saCardMap">
+	select
+		*
+	from <include refid="tableName"></include>
+	where 1=1 
+	<if test="cardNumber != null">
+  		and CARD_NUMBER=#{cardNumber}
+  	</if>
+  	<if test="cardType != null">
+  		and CARD_TYPE=#{cardType}
+  	</if>
+  	<if test="loginAccount != null">
+  		and LOGIN_ACCOUNT=#{loginAccount}
+  	</if> 
+  </select>
+  
+  <!-- 比豆排行榜 -->
+  <select id="descSaCard" resultMap="saCardMap">
+  	select 
+		REPLACE
+	    (
+		  USER_NAME,
+		  substr(USER_NAME,2,if(char_length(USER_NAME)>2,char_length(USER_NAME)-2,1)),
+		  if(char_length(USER_NAME)>3,'**','*')
+		 )AS USER_NAME,(REMAIN_PART+FREEZE_PART)AS REMAIN_PART,LOGIN_ACCOUNT 
+    from <include refid="tableName"></include> 
+    where LOGIN_ACCOUNT NOT LIKE '10%'
+    order by (REMAIN_PART+FREEZE_PART) DESC limit 0,50; 
+  </select>
+  
+  
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  
+  
+  
+  <insert id="insertSaCard">
+  	insert into 
+  		<include refid="tableName"></include>
+  	(
+  		<include refid="Field"></include>
+  	)
+  	values(
+  		   replace(uuid(),'-',''),#{cardNumber},#{configNumber},#{loginAccount},#{remainPart},
+  		   #{freezePart},now(),#{userId}
+  		   )	
+  </insert>	
+  
+   <!-- 根据USER_ID查询积分卡详情 -->	
+   <select id="infoSaCard" parameterType="String" resultMap="saCardMap">
+  	select 
+  		*
+  	from <include refid="tableName"></include>
+  	<where>
+		<if test="userId != null and userId != ''">
+			USER_ID = #{userId} and IS_DELETE!=1
+		</if>
+  	</where>
+  </select>
+  
+  <update id="updateSaCard" parameterType="String">
+  	update <include refid="tableName"></include>
+  	set 
+  		<choose>
+  			<when test="flag != null and flag == 1">
+  				REMAIN_PART=REMAIN_PART+#{remainPart}
+  			</when>
+  			<when test="flag != null and flag == 0">
+  				REMAIN_PART=REMAIN_PART-#{remainPart}
+  			</when>
+  			<otherwise>
+  				REMAIN_PART=REMAIN_PART
+  			</otherwise>
+  		</choose>
+	where CARD_NUMBER=#{cardNumber}
+  </update>
+  
+  <update id="updateAll" parameterType="org.xxpay.dal.dao.card.model.SaCard">
+  	update <include refid="tableName"></include>
+  	set 
+  		<if test="configNumber != null and configNumber !=''">
+  			CONFIG_NUMBER=#{configNumber},
+  		</if>
+  		<if test="cardStatus != null and cardStatus !=''">
+  			CARD_STATUS=#{cardStatus},
+  		</if>
+  		<choose>
+  			<when test="flag != null and flag == '1' and remainPart != null">
+  				REMAIN_PART=REMAIN_PART+#{remainPart}
+  			</when>
+  			<when test="flag != null and flag == '0' and remainPart != null">
+  				REMAIN_PART=REMAIN_PART-#{remainPart}
+  			</when>
+  			<otherwise>
+  				REMAIN_PART=REMAIN_PART
+  			</otherwise>
+  		</choose>
+	where 
+	<if test="cardNumber != null and cardNumber !=''">
+			CARD_NUMBER=#{cardNumber}
+  	</if>
+  	<if test="userId != null and userId !=''">
+  			USER_ID=#{userId}
+  	</if>
+  </update>
+  
+  <update id="update">
+		update
+	        <include refid="tableName"></include>
+	    set
+	    	REMAIN_PART=REMAIN_PART-
+	    	<foreach collection="maps" item="item" index="key" 
+       			 separator=" " open="case USER_ID" close="end">
+       			 when #{key} then #{item}
+    		</foreach>
+	    	
+	    	
+  	where USER_ID in
+  	<foreach item="item" index="key" collection="maps"
+            open="(" separator="," close=")">
+	    #{key}
+    </foreach>
+  </update>
+  
+  <!-- 查询所有积分卡 -->	
+   <select id="listSaCard" parameterType="String" resultMap="saCardMap">
+  	select 
+  		*
+  	from <include refid="tableName"></include>
+  </select>
+  
+</mapper>

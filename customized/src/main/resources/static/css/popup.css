@@ -1,0 +1,54 @@
+/*修改确认对话框*/
+.pop_up_dialog{
+  position:absolute;
+  z-index:11;
+  background-color:transparent;
+  left: 0px;
+  top:0px;
+  width:100%;
+  height:100%;
+}
+
+.pop_up_background{
+  position:absolute;
+  background-color:gray;
+
+  opacity:0.4;
+  left:0px;
+  top:0px;
+  width:100%;
+  height:100%;
+}
+.pop_button_ok{
+  background-color:#99bbbb;
+  float:left;
+  width:35%;
+  text-align:center;
+  font-size:16px;
+}
+
+.pop_button_back{
+  background-color:#99bbbb;
+  float:left;
+  width:35%;
+  text-align:center;
+  font-size:16px;
+}
+
+
+.blank_10{
+  background-color:transparent;
+  float:left;
+  width:10%;
+  height:100%;
+}
+
+.pop_title{
+  background-color:#d7eaff;
+  text-align:center;
+  font-size:12px;
+}
+
+.pop_content{
+  position:absolute;
+}

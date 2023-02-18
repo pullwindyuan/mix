@@ -1,0 +1,113 @@
+ package org.hlpay.common.enumm;
+
+ public enum PayEnum
+ {
+   ERR_0001("0001", "商户签名异常"),
+
+   ERR_0010("0010", "系统错误"),
+   ERR_0011("0011", "请使用post方法"),
+   ERR_0012("0012", "post数据为空"),
+   ERR_0013("0013", "签名错误"),
+   ERR_0014("0014", "参数错误"),
+   ERR_0015("0015", "商户不存在"),
+   ERR_0110("0110", "第三方超时"),
+   ERR_0111("0111", "第三方异常"),
+   ERR_0112("0112", "订单不存在"),
+   ERR_0113("0113", "订单已支付"),
+   ERR_0114("0114", "商品不存在"),
+   ERR_0115("0115", "价格不对"),
+   ERR_0116("0116", "物品数量不对"),
+   ERR_0117("0117", "过程返回255"),
+   ERR_0118("0118", "DB错误"),
+   ERR_0119("0119", "商户订单重复"),
+   ERR_0120("0120", "不支持的支付渠道"),
+   ERR_0200("0200", "订单可退款余额不足"),
+
+   BIZ_CLASS_CANCEL("CANCEL", "销账"),
+   BIZ_CLASS_CANCEL_EXP("CANCEL-INCOME", "销账支出"),
+   BIZ_CLASS_CANCEL_TRUST_EXP("CANCEL-TRUST-EXP", "销账代管支出"),
+   BIZ_CLASS_CANCEL_DUMB_INCOME("CANCEL-DUMB-IMCONE", "销账冲销入账"),
+
+   BIZ_CLASS_RECHARGE("RECHARGE", "充值"),
+   BIZ_CLASS_RECHARGE_INCOME("RECHARGE-INCOME", "充值入账"),
+   BIZ_CLASS_RECHARGE_TRUST_INCOME("RECHARGE-TRUST-INCOME", "充值代管入账"),
+   BIZ_CLASS_RECHARGE_DUMB_EXP("RECHARGE-DUMB-EXP", "充值冲销支出"),
+
+
+   BIZ_CLASS_SETTLE_RECORD("SETTLE_RECORD", "记账记录"),
+
+
+   BIZ_CLASS_AWARD("AWARD", "奖励"),
+   BIZ_CLASS_AWARD_INCOME("AWARD-INCOME", "奖励入账"),
+   BIZ_CLASS_AWARD_EXP("AWARD-EXP", "奖励支出"),
+   BIZ_CLASS_AWARD_DUMB_EXP("AWARD-DUMB-EXP", "奖励冲销支出"),
+   BIZ_CLASS_AWARD_TRUST_INCOME("AWARD-TRUST-INCOME", "奖励代管入账"),
+
+   BIZ_CLASS_REDENVELOPE("REDENVELOPE", "红包"),
+   BIZ_CLASS_REDENVELOPE_INCOME("REDENVELOPE-INCOME", "红包入账"),
+   BIZ_CLASS_REDENVELOPE_EXP("REDENVELOPE-EXP", "红包支出"),
+
+   BIZ_CLASS_TRANS("TRANS", "转账"),
+   BIZ_CLASS_TRANS_INCOME("TRANS-INCOME", "转账入账"),
+   BIZ_CLASS_TRANS_EXP("TRANS-EXP", "转账支出"),
+
+   BIZ_CLASS_EXCHANGE("EXCHANGE", "兑换"),
+   BIZ_CLASS_EXCHANGE_INCOME("EXCHANGE-INCOME", "兑换入账"),
+   BIZ_CLASS_EXCHANGE_EXP("EXCHANGE-EXP", "兑换支出"),
+   BIZ_CLASS_EXCHANGE_DUMB_INCOME("EXCHANGE-DUMB-INCOME", "兑换冲销入账"),
+   BIZ_CLASS_EXCHANGE_DUMB_EXP("EXCHANGE-DUMB-EXP", "兑换冲销支出"),
+   BIZ_CLASS_EXCHANGE_TRUST_EXP("EXCHANGE-TRUST-EXP", "兑换代管支出"),
+   BIZ_CLASS_EXCHANGE_TRUST_INCOME("EXCHANGE-TRUST-INCOME", "兑换代管入账"),
+
+   BIZ_CLASS_WITHDRAW("WITHDRAW", "提币"),
+   BIZ_CLASS_WITHDRAW_INCOME("WITHDRAW-INCOME", "提币入账"),
+   BIZ_CLASS_WITHDRAW_DUMB_INCOME("WITHDRAW-DUMB-INCOME", "提币冲销入账"),
+   BIZ_CLASS_WITHDRAW_TRUST_EXP("WITHDRAW-TRUST-EXP", "提币代管支出"),
+   BIZ_CLASS_WITHDRAW_POUNDAGE_INCOME("WITHDRAW-POUNDAGE-INCOME", "提币手续费收入"),
+   BIZ_CLASS_WITHDRAW_POUNDAGE_EXP("WITHDRAW-POUNDAGE-EXP", "提币手续费支出"),
+   BIZ_CLASS_WITHDRAW_EXP("WITHDRAW-EXP", "提币支出"),
+
+   BIZ_CLASS_PAY("PAY", "支付"),
+   BIZ_CLASS_PAY_INCOME("PAY-INCOME", "支付入账"),
+   BIZ_CLASS_PAY_EXP("PAY-EXP", "支付支出"),
+
+   BIZ_CLASS_SETTLE("SETTLE", "分账"),
+   BIZ_CLASS_SETTLE_INCOME("SETTLE-INCOME", "分账入账"),
+   BIZ_CLASS_SETTLE_EXP("SETTLE-EXP", "分账支出"),
+
+   BIZ_CLASS_SALE_INCOME("SALE-INCOME", "销售收入"),
+
+   BIZ_CLASS_REFUND_SETTLE("REFUND-SETTLE", "退分账"),
+   BIZ_CLASS_REFUND_SETTLE_INCOME("REFUND-SETTLE-INCOME", "退分账入账"),
+   BIZ_CLASS_REFUND_SALE_EXP("REFUND-SALE-EXP", "销售退款支出"),
+
+   BIZ_CLASS_REFUND("REFUND", "退款"),
+   BIZ_CLASS_REFUND_INCOME("REFUND-INCOME", "退款入账"),
+   BIZ_CLASS_REFUND_EXP("REFUND-EXP", "退款支出"),
+
+   BIZ_CLASS_TRANS_REFUND("TRANS-REFUND", "转账退款"),
+   BIZ_CLASS_TRANS_REFUND_INCOME("TRANS-REFUND-INCOME", "转账退款入账"),
+   BIZ_CLASS_TRANS_REFUND_EXP("TRANS-REFUND-EXP", "转账退款支出");
+
+   private String code;
+   private String message;
+
+   PayEnum(String code, String message) {
+     this.code = code;
+     this.message = message;
+   }
+
+
+   public String getCode() {
+     return this.code;
+   }
+
+   public String getMessage() {
+     return this.message;
+   }
+ }
+
+
+
+
+

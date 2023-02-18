@@ -1,0 +1,78 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.futuremap.erp.module.orderprocess.mapper.RecordoutListMapper">
+    <resultMap id="resultMap" type="com.futuremap.erp.module.orderprocess.entity.RecordoutList"/>
+    <select id="sum" resultMap="resultMap">
+        SELECT
+        sum(`iquantity`) iquantity
+        FROM
+        recordout_list
+        <where>
+            <if test="recordoutQuery.id !=null">
+                and id = #{recordoutQuery.id}
+            </if>
+            <if test="recordoutQuery.startDate!=null ">
+                and ddate >= #{recordoutQuery.startDate}
+            </if>
+            <if test="recordoutQuery.endDate!=null ">
+                <![CDATA[and ddate  <  #{recordoutQuery.endDate}]]>
+            </if>
+            <if test = "recordoutQuery.csocode!=null and recordoutQuery.csocode !=''">
+                and csocode = #{recordoutQuery.csocode}
+            </if>
+            <if test = "recordoutQuery.irowno !=null">
+                and irowno = #{recordoutQuery.irowno}
+            </if>
+            <if test = "recordoutQuery.ccode!=null and recordoutQuery.ccode !=''">
+                and ccode = #{recordoutQuery.ccode}
+            </if>
+            <if test = "recordoutQuery.companyCode !=null">
+                and company_code = #{recordoutQuery.companyCode}
+            </if>
+        </where>
+        order by ddate desc
+    </select>
+    <select id="findList" resultMap="resultMap">
+        SELECT
+            `id`,
+            `company_code`,
+            `company_name`,
+            `csocode`,
+            `irowno`,
+            `cinvcode`,
+            `cinvname`,
+            `cinvstd`,
+            `cinvm_unit`,
+            `cdepcode`,
+            `cdepname`,
+            `ccode`,
+            `ddate`,
+            `iquantity`
+        FROM
+        recordout_list
+        <where>
+            <if test="recordoutQuery.id !=null">
+                and id = #{recordoutQuery.id}
+            </if>
+            <if test="recordoutQuery.startDate!=null ">
+                and ddate >= #{recordoutQuery.startDate}
+            </if>
+            <if test="recordoutQuery.endDate!=null ">
+                <![CDATA[and ddate  <  #{recordoutQuery.endDate}]]>
+            </if>
+            <if test = "recordoutQuery.csocode!=null and recordoutQuery.csocode !=''">
+                and csocode = #{recordoutQuery.csocode}
+            </if>
+            <if test = "recordoutQuery.irowno !=null">
+                and irowno = #{recordoutQuery.irowno}
+            </if>
+            <if test = "recordoutQuery.ccode!=null and recordoutQuery.ccode !=''">
+                and ccode = #{recordoutQuery.ccode}
+            </if>
+            <if test = "recordoutQuery.companyCode !=null">
+                and company_code = #{recordoutQuery.companyCode}
+            </if>
+        </where>
+            order by ddate desc
+    </select>
+</mapper>

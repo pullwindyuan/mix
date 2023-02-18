@@ -1,0 +1,69 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="org.hlpay.base.mapper.SaScoreTypeUserMapper" >
+  <resultMap id="saScoreTypeUserMap" type="org.hlpay.base.model.SaScoreTypeUser" >
+    <id column="SCORE_TYPE_ID" property="scoreTypeId"/>
+    <result column="TYPE_NAME" property="typeName"/>
+    <result column="TYPE_CODE" property="typeCode"/>
+    <result column="REMAIN_PART" property="remianPart"/>
+    <result column="LOGIN_ACCOUNT" property="loginAccount"/>
+    <result column="USER_ID" property="userId"/>
+    <result column="STATUS" property="status"/>
+    <result column="IS_DELETE" property="isDelete"/>
+    <result column="FLAG" property="flag"/>
+  </resultMap>
+
+  <!--表名 -->
+  <sql id="tableName">
+	sa_score_type_user
+  </sql>
+
+  <!-- 字段 -->
+  <sql id="Field">
+  	SCORE_TYPE_ID,
+	TYPE_NAME,
+	TYPE_CODE,
+	REMAIN_PART,
+	LOGIN_ACCOUNT,
+	USER_ID
+  </sql>
+
+  <insert id="save">
+  	insert into
+  		<include refid="tableName"></include>
+  	(
+  		<include refid="Field"></include>
+  	)
+  	values(
+  		   replace(uuid(),'-',''),#{typeName},#{typeCode},#{remianPart},#{loginAccount},#{userId}
+  		   )
+  </insert>
+
+  <select id="info" resultMap="saScoreTypeUserMap">
+  	select
+  		*
+  	from <include refid="tableName"></include>
+  	where 1=1
+  	<if test="userId != null and userId != ''">
+  		and USER_ID=#{userId}
+  	</if>
+  </select>
+
+  <update id="update">
+  	update
+  		<include refid="tableName"></include>
+  	set
+  		<if test="flag == '0'">
+  			REMAIN_PART=REMAIN_PART-#{remianPart},
+  		</if>
+  		<if test="flag == '1'">
+  			REMAIN_PART=REMAIN_PART+#{remianPart},
+  		</if>
+  		USER_ID=USER_ID
+  	where
+  	<if test="userId != null and userId != ''">
+  		USER_ID=#{userId}
+  	</if>
+  </update>
+
+</mapper>

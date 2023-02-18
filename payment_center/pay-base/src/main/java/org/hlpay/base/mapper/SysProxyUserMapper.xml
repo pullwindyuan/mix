@@ -1,0 +1,54 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="org.hlpay.base.mapper.SysProxyUserMapper" >
+  <resultMap id="sysProxyUserMap" type="org.hlpay.base.model.SysProxyUser" >
+    <id column="PROXY_ID" property="proxyId"/>
+    <result column="PROXY_NUMBER" property="proxyNumber"/>
+   	<result column="PROXY_TYPE" property="proxyType"/>
+   	<result column="PROXY_NAME" property="proxyName"/>
+   	<result column="COMPANY_NAME" property="companyName"/>
+   	<result column="COMPANY_PHONE" property="companyPhone"/>
+   	<result column="OFFICE_ADDR" property="officeAddr"/>
+   	<result column="CONTACT" property="contact"/>
+   	<result column="CONTACT_PHONE" property="contactPhone"/>
+   	<result column="CONTACT_EMAIL" property="contactEmail"/>
+   	<result column="REG_ATTACHMENT" property="regAttachment"/>
+   	<result column="USER_ID" property="userId"/>
+    <result column="IS_DELETE" property="isDelete"/>
+    <result column="FLAG" property="flag"/>
+    <result column="STATUS" property="status"/>
+  </resultMap>
+
+  <!--表名 -->
+  <sql id="tableName">
+	sys_u_proxy_user
+  </sql>
+
+  <!-- 字段 -->
+  <sql id="Field">
+  	PROXY_ID,
+	PROXY_NUMBER,
+	PROXY_TYPE,
+	PROXY_NAME,
+	COMPANY_NAME,
+	COMPANY_PHONE,
+	OFFICE_ADDR,
+	CONTACT,
+	CONTACT_PHONE,
+	CONTACT_EMAIL,
+	REG_ATTACHMENT,
+	USER_ID
+  </sql>
+
+   <select id="infoSysProxyUser" parameterType="String" resultMap="sysProxyUserMap">
+  	select
+  		*
+  	from <include refid="tableName"></include>
+  	<where>
+		<if test="proxyNumber != null and proxyNumber != ''">
+			PROXY_NUMBER = #{proxyNumber} and IS_DELETE!=1
+		</if>
+  	</where>
+  </select>
+
+</mapper>

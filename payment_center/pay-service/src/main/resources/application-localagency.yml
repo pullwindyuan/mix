@@ -1,0 +1,238 @@
+server:
+  port: 3020
+
+deploy:
+  # 配置成public表示当前运行在公域模式，配置成private表示运行在私域模式
+  runMode: private
+  #配置成===《公域支付中心》===pay-mgr.jar的部署地址，生产的时候IP会变成域名，端口也会隐藏
+  publicPlatformPayMgrDeployUrl: http://192.168.1.39:8090
+  #配置成pay-service.jar的部署地址，生产的时候IP会变成域名，端口也会隐藏
+  payServiceDeployUrl: http://paytest.wljiam.com
+
+database:
+  #注意：一定记得加上&autoReconnect=true这个连接参数，不然sql中的多个语句一起提交执行会报错
+  url: jdbc:mysql://127.0.0.1:3306/pay_center?useUnicode=true&characterEncoding=utf-8&autoReconnect=true&useSSL=false&allowMultiQueries=true&serverTimezone=GMT%2B8
+  username: root
+  password: 123456
+  #使用明文密码
+  connection-properties: config.decrypt=false
+
+redis:
+  database: 13
+  host: 192.168.1.38
+  port: 6379
+  password:
+
+rabbitmq: # 不同服务使用相同nameSpace，相同virtualHost，相同交换机和队列名称的情况下可以队列共享
+  nameSpace: PAYCENTER-LOCAL
+  host: 192.168.1.38
+  port: 5672
+  virtualHost: /${rabbitmq.nameSpace}/${deploy.runMode}
+  username: qhhq
+  password: qhhqrabbitmq
+
+# IP白名单
+security:
+  ipList: 192.168.1.39|192.168.1.41|192.168.1.40|127.0.0.1|192.168.1.89
+#打印sql，方便调试
+#mybatis:
+#  configuration:
+#    log-impl: org.apache.ibatis.logging.stdout.StdOutImpl
+#===========如果是生产环境一定要记得关闭该选项：设置为false===============
+enableSwagger: true
+
+spring:
+  jackson:
+      date-format: yyyy-MM-dd HH:mm:ss
+      time-zone: GMT+8
+      default-property-inclusion: non_null
+  zipkin:
+    base-url: http://localhost:9411/
+    discovery-client-enabled: false
+  freemarker:
+    cache: false
+    charset: UTF-8
+    check-template-location: true
+    content-type: text/html
+    expose-request-attributes: true
+    expose-session-attributes: true
+    request-context-attribute: request
+    suffix: .ftl
+    templateEncoding: UTF-8
+    templateLoaderPath: classpath:/templates/
+
+  datasource:
+    #使用druid数据源
+    type: com.alibaba.druid.pool.DruidDataSource
+    #druid:
+    url: ${database.url}
+    username: ${database.username}
+    password: ${database.password}
+    #使用明文密码
+    connection-properties: ${database.connection-properties}
+    stat:
+      #打开mergeSql功能
+      mergeSql: true
+      #慢SQL记录
+      slowSqlMillis: 5000
+      # 最小连接池数量
+    minIdle: 5
+    #合并多个DruidDataSource的监控数据
+    useGlobalDataSourceStat: true
+      #验证连接有效与否的SQL，不同的数据配置不同:
+    #Mysql:SELECT 1;
+    #SQLSERVER:SELECT 1;
+    #ORACLE:SELECT 'x' FROM DUAL;
+    #PostGresql:SELECT 'x';
+    validationQuery: select 1
+    # 初始化时建立物理连接的个数
+    initialSize: 5
+    # 获取连接时最大等待时间，单位毫秒
+    maxWait: 60000
+    # 配置监控统计拦截的filters，去掉后监控界面sql无法统计，'wall'用于防火墙
+    filters: config,stat,slf4j
+    filter:
+      slf4j:
+        connection-log-enabled: false
+        statement-log-enabled: false
+        result-set-log-enabled: true
+        statement-executable-sql-log-enable: true
+      # 打开PSCache并且指定每个连接上PSCache的大小为20
+      # 连接池可以缓存PreparedStatement，本质上就是缓存游标。
+      # 一个SQL语句，增删改查 都是游标操作，只不过Select游标指向查询结果，而其余的指向修改的目标。
+    # 除了连接可以缓存，游标也是可以缓存的，主要是避免游标的反复创建。
+    # 打开PSCache
+    poolPreparedStatements: true
+    # 指定每个连接上PSCache的大小
+    maxPoolPreparedStatementPerConnectionSize: 20
+    # 建议配置为true，不影响性能，并且保证安全性。申请连接的时候检测，如果空闲时间大于timeBetweenEvictionRunsMillis，执行validationQuery检测连接是否有效。
+    testWhileIdle: true
+    # 申请连接时执行validationQuery检测连接是否有效，做了这个配置会降低性能。
+    testOnBorrow: false
+    # 配置一个连接在池中最小生存的时间，单位是毫秒
+    minEvictableIdleTimeMillis: 300000
+    # 配置间隔多久才进行一次检测，检测需要关闭的空闲连接，单位是毫秒
+    timeBetweenEvictionRunsMillis: 60000
+    # 归还连接时执行validationQuery检测连接是否有效，做了这个配置会降低性能。
+    testOnReturn: false
+    driver-class-name: com.mysql.cj.jdbc.Driver
+    # 最大连接池数量
+    maxActive: 20
+    # 开启连接池回收，开发环境开启
+    remove-abandoned: true
+    # 超时连接回收时间，单位秒
+    remove-abandoned-timeout: 60
+    # 回收连接时打印日志
+    log-abandoned: true
+  redis:
+    database: ${redis.database}
+    host: ${redis.host}
+    port: ${redis.port}
+    password: ${redis.password}
+    lettuce:
+      pool:
+        max-idle: 20
+  rabbitmq:
+    host: ${rabbitmq.host}
+    port: ${rabbitmq.port}
+    virtualHost: ${rabbitmq.virtualHost}
+    username: ${rabbitmq.username}
+    password: ${rabbitmq.password}
+#    支持发布确认
+#      publisher-confirms: true
+#    支持发布返回
+#      publisher-returns: true
+    listener:
+        simple:
+#      采用手动应答
+          #acknowledge-mode: manual
+          acknowledge-mode: auto
+#        当前监听容器数
+          concurrency: 1
+#        最大数
+          max-concurrency: 1
+#        是否支持重试
+          retry:
+            enabled: true
+  sleuth:
+    sampler:
+      percentage: 1
+  mvc:
+    favicon:
+      enabled: true
+
+feign:
+  httpclient:
+    enabled: false
+  okhttp:
+    enabled: true
+
+ribbon:
+  eureka:
+    enabled: true
+  ReadTimeout: 120000
+  ConnectTimeout: 120000
+  MaxAutoRetries: 0
+  MaxAutoRetriesNextServer: 1
+  OkToRetryOnAllOperations: false
+
+hystrix:
+  threadpool:
+    default:
+      coreSize: 1000 #并发执行的最大线程数，默认10
+      maxQueueSize: 1000 #BlockingQueue的最大队列数
+      queueSizeRejectionThreshold: 500 #即使maxQueueSize没有达到，达到queueSizeRejectionThreshold该值后，请求也会被拒绝
+  command:
+    default:
+      execution:
+        isolation:
+          thread:
+            timeoutInMilliseconds: 110000
+
+logging:
+  level.org.hlpay: info
+  file:
+    path: ./log
+    name: pay.log
+  pattern:
+    console: '%clr(%d{HH:mm:ss.SSS} %-5level %cyan(%logger{50}) - %msg%n)'
+    file: '%d{yyyy-MM-dd HH:mm:ss.SSS} >>> [%thread] >>> %-5level >>> %logger{50} >>> %msg%n'
+
+# swagger
+swagger:
+  version: 1.0.0
+  license: 物连家美
+  licenseUrl: http://www.wljiam.com
+  termsOfServiceUrl: http://www.wljiam.com
+  contact:
+    name: pullwind
+    url: http://www.wljiam.com
+    email: admin@wljiam.com
+
+  title: pay center mgr
+  description: 支付中心配置接口
+  base-package: org.hlpay.boot
+
+  #仅仅在开发模式下才能开启
+  enabled: ${enableSwagger}
+
+#Twitter_Snowflake 序列号生成器配置
+Snowflake:
+  #工作中心ID 0-31
+  workerId: ${random.int[0,31]}
+  #数据中心ID(0~31)
+  datacenterId: ${random.int[0,31]}
+
+config:
+  ali:
+    notify_url: ${deploy.payServiceDeployUrl}/notify/pay/aliPayNotifyRes.htm
+    return_url: https://www.wljiam.com
+  wx:
+    #certRootPath: /home/pay/cert/wx
+    certRootPath: D:CERT/common
+    notifyUrl: ${deploy.payServiceDeployUrl}/notify/pay/wxPayNotifyRes.htm
+    refundNotifyUrl: ${deploy.payServiceDeployUrl}/notify/pay/wxPayNotifyRes.htm
+
+  union:
+    frontNotifyUrl: http://www.wljiam.com
+    backNotifyUrl: ${deploy.payServiceDeployUrl}/notify/pay/unionPayNotifyRes

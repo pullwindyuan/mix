@@ -1,0 +1,595 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="org.hlpay.base.mapper.MchInfoMapper" >
+  <resultMap id="BaseResultMap" type="org.hlpay.base.model.MchInfo" >
+    <id column="MchId" property="mchId" jdbcType="VARCHAR" />
+    <result column="SettleType" property="settleType" jdbcType="VARCHAR" />
+    <result column="SettleParams" property="settleParams" jdbcType="VARCHAR" />
+    <result column="SecurityUrl" property="securityUrl" jdbcType="VARCHAR" />
+    <result column="ParentMchId" property="parentMchId" jdbcType="VARCHAR" />
+    <result column="ExternalId" property="externalId" jdbcType="VARCHAR" />
+    <result column="ParentExternalId" property="parentExternalId" jdbcType="VARCHAR" />
+    <result column="Name" property="name" jdbcType="VARCHAR" />
+    <result column="Type" property="type" jdbcType="VARCHAR" />
+    <result column="ReqKey" property="reqKey" jdbcType="VARCHAR" />
+    <result column="ResKey" property="resKey" jdbcType="VARCHAR" />
+    <result column="State" property="state" jdbcType="TINYINT" />
+    <result column="CreateTime" property="createTime" jdbcType="TIMESTAMP" />
+    <result column="UpdateTime" property="updateTime" jdbcType="TIMESTAMP" />
+  </resultMap>
+  <sql id="Example_Where_Clause" >
+    <where >
+      <foreach collection="oredCriteria" item="criteria" separator="or" >
+        <if test="criteria.valid" >
+          <trim prefix="(" suffix=")" prefixOverrides="and" >
+            <foreach collection="criteria.criteria" item="criterion" >
+              <choose >
+                <when test="criterion.noValue" >
+                  and ${criterion.condition}
+                </when>
+                <when test="criterion.singleValue" >
+                  and ${criterion.condition} #{criterion.value}
+                </when>
+                <when test="criterion.betweenValue" >
+                  and ${criterion.condition} #{criterion.value} and #{criterion.secondValue}
+                </when>
+                <when test="criterion.listValue" >
+                  and ${criterion.condition}
+                  <foreach collection="criterion.value" item="listItem" open="(" close=")" separator="," >
+                    #{listItem}
+                  </foreach>
+                </when>
+              </choose>
+            </foreach>
+          </trim>
+        </if>
+      </foreach>
+    </where>
+  </sql>
+  <sql id="Update_By_Example_Where_Clause" >
+    <where >
+      <foreach collection="example.oredCriteria" item="criteria" separator="or" >
+        <if test="criteria.valid" >
+          <trim prefix="(" suffix=")" prefixOverrides="and" >
+            <foreach collection="criteria.criteria" item="criterion" >
+              <choose >
+                <when test="criterion.noValue" >
+                  and ${criterion.condition}
+                </when>
+                <when test="criterion.singleValue" >
+                  and ${criterion.condition} #{criterion.value}
+                </when>
+                <when test="criterion.betweenValue" >
+                  and ${criterion.condition} #{criterion.value} and #{criterion.secondValue}
+                </when>
+                <when test="criterion.listValue" >
+                  and ${criterion.condition}
+                  <foreach collection="criterion.value" item="listItem" open="(" close=")" separator="," >
+                    #{listItem}
+                  </foreach>
+                </when>
+              </choose>
+            </foreach>
+          </trim>
+        </if>
+      </foreach>
+    </where>
+  </sql>
+  <sql id="Base_Column_List" >
+    MchId, SettleType, SettleParams, SecurityUrl, ParentMchId, ExternalId, ParentExternalId, Name, Type, ReqKey, ResKey, State, CreateTime, UpdateTime
+  </sql>
+  <select id="selectByExample" resultMap="BaseResultMap" parameterType="org.hlpay.base.model.MchInfoExample" >
+  select
+  <if test="distinct" >
+    distinct
+  </if>
+  <include refid="Base_Column_List" />
+  from t_mch_info
+  <if test="_parameter != null" >
+    <include refid="Example_Where_Clause" />
+  </if>
+  <if test="orderByClause != null" >
+    order by ${orderByClause}
+  </if>
+  <if test="limit != null" >
+    <if test="offset != null" >
+      limit ${offset}, ${limit}
+    </if>
+    <if test="offset == null" >
+      limit ${limit}
+    </if>
+  </if>
+</select>
+  <select id="selectByExampleFromAudit" resultMap="BaseResultMap" parameterType="org.hlpay.base.model.MchInfoExample" >
+    select
+    <if test="distinct" >
+      distinct
+    </if>
+    <include refid="Base_Column_List" />
+    from t_mch_info_audit
+    <if test="_parameter != null" >
+      <include refid="Example_Where_Clause" />
+    </if>
+    <if test="orderByClause != null" >
+      order by ${orderByClause}
+    </if>
+    <if test="limit != null" >
+      <if test="offset != null" >
+        limit ${offset}, ${limit}
+      </if>
+      <if test="offset == null" >
+        limit ${limit}
+      </if>
+    </if>
+  </select>
+  <select id="selectByPrimaryKey" resultMap="BaseResultMap" parameterType="java.lang.String" >
+    select 
+    <include refid="Base_Column_List" />
+    from t_mch_info
+    where MchId = #{mchId,jdbcType=VARCHAR}
+  </select>
+  <select id="selectByPrimaryKeyForAudit" resultMap="BaseResultMap" parameterType="java.lang.String" >
+    select
+    <include refid="Base_Column_List" />
+    from t_mch_info_audit
+    where MchId = #{mchId,jdbcType=VARCHAR}
+  </select>
+  <delete id="deleteByPrimaryKey" parameterType="java.lang.String" >
+    delete from t_mch_info
+    where MchId = #{mchId,jdbcType=VARCHAR}
+  </delete>
+  <delete id="deleteByExample" parameterType="org.hlpay.base.model.MchInfoExample" >
+    delete from t_mch_info
+    <if test="_parameter != null" >
+      <include refid="Example_Where_Clause" />
+    </if>
+  </delete>
+  <insert id="insert" parameterType="org.hlpay.base.model.MchInfo" >
+    insert into t_mch_info (MchId, SettleType, SettleParams, SecurityUrl, ParentMchId, ExternalId, ParentExternalId, Name, Type,
+      ReqKey, ResKey, State, 
+      CreateTime, UpdateTime)
+    values (#{mchId,jdbcType=VARCHAR}, #{settleType,jdbcType=VARCHAR}, #{settleParams,jdbcType=VARCHAR}, #{securityUrl,jdbcType=VARCHAR}, #{parentMchId,jdbcType=VARCHAR},
+    #{externalId,jdbcType=VARCHAR}, #{parentExternalId,jdbcType=VARCHAR},
+    #{name,jdbcType=VARCHAR}, #{type,jdbcType=VARCHAR},
+      #{reqKey,jdbcType=VARCHAR}, #{resKey,jdbcType=VARCHAR}, #{state,jdbcType=TINYINT})
+  </insert>
+
+  <insert id="listInsertExternalMchInfo" parameterType="java.util.List">
+    insert into t_mch_info
+    <trim prefix="(" suffix=")" suffixOverrides="," >
+        MchId,
+        ParentMchId,
+        ExternalId,
+        ParentExternalId,
+        Name,
+        Type,
+        ReqKey,
+        ResKey,
+        State
+    </trim>
+    values
+      <foreach collection="list" item="item" index="index" separator=",">
+      (
+        #{item.mchId},
+        #{item.parentMchId},
+        #{item.externalId},
+        #{item.parentExternalId},
+        #{item.name},
+        #{item.type},
+        #{item.reqKey},
+        #{item.resKey},
+        #{item.state}
+        )
+      </foreach>
+  </insert>
+
+  <insert id="insertSelective" parameterType="org.hlpay.base.model.MchInfo" >
+    insert into t_mch_info
+    <trim prefix="(" suffix=")" suffixOverrides="," >
+      <if test="mchId != null" >
+        MchId,
+      </if>
+      <if test="settleType != null" >
+        SettleType,
+      </if>
+      <if test="settleParams != null" >
+        SettleParams,
+      </if>
+      <if test="securityUrl != null" >
+        SecurityUrl,
+      </if>
+      <if test="parentMchId != null" >
+        ParentMchId,
+      </if>
+      <if test="externalId != null" >
+        ExternalId,
+      </if>
+      <if test="parentExternalId != null" >
+        ParentExternalId,
+      </if>
+      <if test="name != null" >
+        Name,
+      </if>
+      <if test="type != null" >
+        Type,
+      </if>
+      <if test="reqKey != null" >
+        ReqKey,
+      </if>
+      <if test="resKey != null" >
+        ResKey,
+      </if>
+      <if test="state != null" >
+        State
+      </if>
+    </trim>
+    <trim prefix="values (" suffix=")" suffixOverrides="," >
+      <if test="mchId != null" >
+        #{mchId,jdbcType=VARCHAR},
+      </if>
+      <if test="settleType != null" >
+        #{settleType,jdbcType=VARCHAR},
+      </if>
+      <if test="settleParams != null" >
+        #{settleParams,jdbcType=VARCHAR},
+      </if>
+      <if test="securityUrl != null" >
+        #{securityUrl,jdbcType=VARCHAR},
+      </if>
+      <if test="parentMchId != null" >
+        #{parentMchId,jdbcType=VARCHAR},
+      </if>
+      <if test="externalId != null" >
+        #{externalId,jdbcType=VARCHAR},
+      </if>
+      <if test="parentExternalId != null" >
+        #{parentExternalId,jdbcType=VARCHAR},
+      </if>
+      <if test="name != null" >
+        #{name,jdbcType=VARCHAR},
+      </if>
+      <if test="type != null" >
+        #{type,jdbcType=VARCHAR},
+      </if>
+      <if test="reqKey != null" >
+        #{reqKey,jdbcType=VARCHAR},
+      </if>
+      <if test="resKey != null" >
+        #{resKey,jdbcType=VARCHAR},
+      </if>
+      <if test="state != null" >
+        #{state,jdbcType=TINYINT}
+      </if>
+    </trim>
+
+    <!--存在即可修改下述字段的数据，注意values()中的内容是数据表中相应的字段名-->
+    on DUPLICATE key update
+    <trim suffixOverrides="," >
+      <if test="mchId != null" >
+        MchId=#{mchId,jdbcType=VARCHAR},
+      </if>
+      <if test="settleType != null" >
+        SettleType=#{settleType,jdbcType=VARCHAR},
+      </if>
+      <if test="settleParams != null" >
+        SettleParams=#{settleParams,jdbcType=VARCHAR},
+      </if>
+      <if test="securityUrl != null" >
+        SecurityUrl=#{securityUrl,jdbcType=VARCHAR},
+      </if>
+      <if test="parentMchId != null" >
+        ParentMchId=#{parentMchId,jdbcType=VARCHAR},
+      </if>
+      <if test="externalId != null" >
+        ExternalId=#{externalId,jdbcType=VARCHAR},
+      </if>
+      <if test="parentExternalId != null" >
+        ParentExternalId=#{parentExternalId,jdbcType=VARCHAR},
+      </if>
+      <if test="name != null" >
+        Name=#{name,jdbcType=VARCHAR},
+      </if>
+      <if test="type != null" >
+        Type=#{type,jdbcType=VARCHAR},
+      </if>
+      <if test="reqKey != null" >
+        ReqKey=#{reqKey,jdbcType=VARCHAR},
+      </if>
+      <if test="resKey != null" >
+        ResKey=#{resKey,jdbcType=VARCHAR},
+      </if>
+      <if test="state != null" >
+        State=#{state,jdbcType=TINYINT}
+      </if>
+    </trim>
+  </insert>
+  <insert id="insertSelectiveForAudit" parameterType="org.hlpay.base.model.MchInfo" >
+    insert into t_mch_info_audit
+    <trim prefix="(" suffix=")" suffixOverrides="," >
+      <if test="mchId != null" >
+        MchId,
+      </if>
+      <if test="settleType != null" >
+        SettleType,
+      </if>
+      <if test="settleParams != null" >
+        SettleParams,
+      </if>
+      <if test="securityUrl != null" >
+        SecurityUrl,
+      </if>
+      <if test="parentMchId != null" >
+        ParentMchId,
+      </if>
+      <if test="externalId != null" >
+        ExternalId,
+      </if>
+      <if test="parentExternalId != null" >
+        ParentExternalId,
+      </if>
+      <if test="name != null" >
+        Name,
+      </if>
+      <if test="type != null" >
+        Type,
+      </if>
+      <if test="reqKey != null" >
+        ReqKey,
+      </if>
+      <if test="resKey != null" >
+        ResKey,
+      </if>
+      <if test="state != null" >
+        State,
+      </if>
+    </trim>
+    <trim prefix="values (" suffix=")" suffixOverrides="," >
+      <if test="mchId != null" >
+        #{mchId,jdbcType=VARCHAR},
+      </if>
+      <if test="settleType != null" >
+        #{settleType,jdbcType=VARCHAR},
+      </if>
+      <if test="settleParams != null" >
+        #{settleParams,jdbcType=VARCHAR},
+      </if>
+      <if test="securityUrl != null" >
+        #{securityUrl,jdbcType=VARCHAR},
+      </if>
+      <if test="parentMchId != null" >
+        #{parentMchId,jdbcType=VARCHAR},
+      </if>
+      <if test="externalId != null" >
+        #{externalId,jdbcType=VARCHAR},
+      </if>
+      <if test="parentExternalId != null" >
+        #{parentExternalId,jdbcType=VARCHAR},
+      </if>
+      <if test="name != null" >
+        #{name,jdbcType=VARCHAR},
+      </if>
+      <if test="type != null" >
+        #{type,jdbcType=VARCHAR},
+      </if>
+      <if test="reqKey != null" >
+        #{reqKey,jdbcType=VARCHAR},
+      </if>
+      <if test="resKey != null" >
+        #{resKey,jdbcType=VARCHAR},
+      </if>
+      <if test="state != null" >
+        #{state,jdbcType=TINYINT}
+      </if>
+    </trim>
+  </insert>
+  <insert id="insertSelectiveForTest" parameterType="org.hlpay.base.model.MchInfo" >
+    insert into t_mch_info_copy
+    <trim prefix="(" suffix=")" suffixOverrides="," >
+      <if test="mchId != null" >
+        MchId,
+      </if>
+      <if test="settleType != null" >
+        SettleType,
+      </if>
+      <if test="settleParams != null" >
+        SettleParams,
+      </if>
+      <if test="securityUrl != null" >
+        SecurityUrl,
+      </if>
+      <if test="parentMchId != null" >
+        ParentMchId,
+      </if>
+      <if test="externalId != null" >
+        ExternalId,
+      </if>
+      <if test="parentExternalId != null" >
+        ParentExternalId,
+      </if>
+      <if test="name != null" >
+        Name,
+      </if>
+      <if test="type != null" >
+        Type,
+      </if>
+      <if test="reqKey != null" >
+        ReqKey,
+      </if>
+      <if test="resKey != null" >
+        ResKey,
+      </if>
+      <if test="state != null" >
+        State,
+      </if>
+    </trim>
+    <trim prefix="values (" suffix=")" suffixOverrides="," >
+      <if test="mchId != null" >
+        #{mchId,jdbcType=VARCHAR},
+      </if>
+      <if test="settleType != null" >
+        #{settleType,jdbcType=VARCHAR},
+      </if>
+      <if test="settleParams != null" >
+        #{settleParams,jdbcType=VARCHAR},
+      </if>
+      <if test="securityUrl != null" >
+        #{securityUrl,jdbcType=VARCHAR},
+      </if>
+      <if test="parentMchId != null" >
+        #{parentMchId,jdbcType=VARCHAR},
+      </if>
+      <if test="externalId != null" >
+        #{externalId,jdbcType=VARCHAR},
+      </if>
+      <if test="parentExternalId != null" >
+        #{parentExternalId,jdbcType=VARCHAR},
+      </if>
+      <if test="name != null" >
+        #{name,jdbcType=VARCHAR},
+      </if>
+      <if test="type != null" >
+        #{type,jdbcType=VARCHAR},
+      </if>
+      <if test="reqKey != null" >
+        #{reqKey,jdbcType=VARCHAR},
+      </if>
+      <if test="resKey != null" >
+        #{resKey,jdbcType=VARCHAR},
+      </if>
+      <if test="state != null" >
+        #{state,jdbcType=TINYINT}
+      </if>
+    </trim>
+  </insert>
+  <select id="countByExample" parameterType="org.hlpay.base.model.MchInfoExample" resultType="java.lang.Integer" >
+    select count(*) from t_mch_info
+    <if test="_parameter != null" >
+      <include refid="Example_Where_Clause" />
+    </if>
+  </select>
+  <update id="updateByExampleSelective" parameterType="map" >
+    update t_mch_info
+    <set >
+      <if test="record.settleType != null" >
+        SettleType = #{record.settleType,jdbcType=VARCHAR},
+      </if>
+      <if test="record.settleParams != null" >
+        SettleParams = #{record.settleParams,jdbcType=VARCHAR},
+      </if>
+      <if test="record.securityUrl != null" >
+        SecurityUrl = #{record.securityUrl,jdbcType=VARCHAR},
+      </if>
+      <if test="record.name != null" >
+        Name = #{record.name,jdbcType=VARCHAR},
+      </if>
+      <if test="record.type != null" >
+        Type = #{record.type,jdbcType=VARCHAR},
+      </if>
+      <if test="record.reqKey != null" >
+        ReqKey = #{record.reqKey,jdbcType=VARCHAR},
+      </if>
+      <if test="record.resKey != null" >
+        ResKey = #{record.resKey,jdbcType=VARCHAR},
+      </if>
+      <if test="record.state != null" >
+        State = #{record.state,jdbcType=TINYINT}
+      </if>
+    </set>
+    <if test="_parameter != null" >
+      <include refid="Update_By_Example_Where_Clause" />
+    </if>
+  </update>
+  <update id="updateByExample" parameterType="map" >
+    update t_mch_info
+    set MchId = #{record.mchId,jdbcType=VARCHAR},
+        SettleType = #{record.settleType,jdbcType=VARCHAR},
+        SettleParams = #{record.settleParams,jdbcType=VARCHAR},
+        SecurityUrl = #{record.securityUrl,jdbcType=VARCHAR},
+        ParentMchId = #{record.parentMchId,jdbcType=VARCHAR},
+        ExternalId = #{record.externalId,jdbcType=VARCHAR},
+        ParentExternalId = #{record.parentExternalId,jdbcType=VARCHAR},
+      Name = #{record.name,jdbcType=VARCHAR},
+      Type = #{record.type,jdbcType=VARCHAR},
+      ReqKey = #{record.reqKey,jdbcType=VARCHAR},
+      ResKey = #{record.resKey,jdbcType=VARCHAR},
+      State = #{record.state,jdbcType=TINYINT}
+    <if test="_parameter != null" >
+      <include refid="Update_By_Example_Where_Clause" />
+    </if>
+  </update>
+  <update id="updateByPrimaryKeySelective" parameterType="org.hlpay.base.model.MchInfo" >
+    update t_mch_info
+    <set >
+      <if test="settleType != null" >
+        SettleType = #{settleType,jdbcType=VARCHAR},
+      </if>
+      <if test="settleParams != null" >
+        SettleParams = #{settleParams,jdbcType=VARCHAR},
+      </if>
+      <if test="securityUrl != null" >
+        SecurityUrl = #{securityUrl,jdbcType=VARCHAR},
+      </if>
+      <if test="name != null" >
+        Name = #{name,jdbcType=VARCHAR},
+      </if>
+      <if test="type != null" >
+        Type = #{type,jdbcType=VARCHAR},
+      </if>
+      <if test="reqKey != null" >
+        ReqKey = #{reqKey,jdbcType=VARCHAR},
+      </if>
+      <if test="resKey != null" >
+        ResKey = #{resKey,jdbcType=VARCHAR},
+      </if>
+      <if test="state != null" >
+        State = #{state,jdbcType=TINYINT}
+      </if>
+    </set>
+    where MchId = #{mchId,jdbcType=VARCHAR}
+  </update>
+  <update id="updateByPrimaryKeySelectiveForAudit" parameterType="org.hlpay.base.model.MchInfo" >
+    update t_mch_info_audit
+    <set >
+      <if test="settleType != null" >
+        SettleType = #{settleType,jdbcType=VARCHAR},
+      </if>
+      <if test="settleParams != null" >
+        SettleParams = #{settleParams,jdbcType=VARCHAR},
+      </if>
+      <if test="securityUrl != null" >
+        SecurityUrl = #{securityUrl,jdbcType=VARCHAR},
+      </if>
+      <if test="name != null" >
+        Name = #{name,jdbcType=VARCHAR},
+      </if>
+      <if test="type != null" >
+        Type = #{type,jdbcType=VARCHAR},
+      </if>
+      <if test="reqKey != null" >
+        ReqKey = #{reqKey,jdbcType=VARCHAR},
+      </if>
+      <if test="resKey != null" >
+        ResKey = #{resKey,jdbcType=VARCHAR},
+      </if>
+      <if test="state != null" >
+        State = #{state,jdbcType=TINYINT}
+      </if>
+    </set>
+    where MchId = #{mchId,jdbcType=VARCHAR}
+  </update>
+  <update id="updateByPrimaryKey" parameterType="org.hlpay.base.model.MchInfo" >
+    update t_mch_info
+    set SettleType = #{settleType,jdbcType=VARCHAR},
+        SettleParams = #{settleParams,jdbcType=VARCHAR},
+        SecurityUrl = #{securityUrl,jdbcType=VARCHAR},
+        ParentMchId = #{parentMchId,jdbcType=VARCHAR},
+        ExternalId = #{externalId,jdbcType=VARCHAR},
+        ParentExternalId = #{parentExternalId,jdbcType=VARCHAR},
+      Name = #{name,jdbcType=VARCHAR},
+      Type = #{type,jdbcType=VARCHAR},
+      ReqKey = #{reqKey,jdbcType=VARCHAR},
+      ResKey = #{resKey,jdbcType=VARCHAR},
+      State = #{state,jdbcType=TINYINT}
+    where MchId = #{mchId,jdbcType=VARCHAR}
+  </update>
+</mapper>

@@ -1,0 +1,254 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.futuremap.erp.module.operation.mapper.OperatingStatementMapper">
+    <resultMap id="resultMap" type="com.futuremap.erp.module.operation.entity.OperatingStatement"/>
+    <select id="findList" resultMap="resultMap"
+            parameterType="com.futuremap.erp.module.operation.entity.OperatingStatementQuery">
+
+        SELECT
+        `id`,
+        `yearmonth`,
+        `year`,
+        `month`,
+        `company_code`,
+        `cexch_name`,
+        `isum`,
+        `inatsum`,
+        `exflag`,
+        `level_type`,
+        `sort`,
+        `parent_code`,
+         class_code,
+        `name`
+        FROM
+        operating_statement
+        <where>
+            <![CDATA[  company_code = '0000']]>
+            <if test="operatingStatementQuery.id !=null">
+                and id = #{operatingStatementQuery.id}
+            </if>
+            <if test="operatingStatementQuery.year !=null">
+                and year = #{operatingStatementQuery.year}
+            </if>
+            <if test = "operatingStatementQuery.startDate !=null">
+                and yearmonth >= #{operatingStatementQuery.startDate}
+            </if>
+            <if test = "operatingStatementQuery.endDate !=null">
+                 <![CDATA[   and yearmonth < #{operatingStatementQuery.endDate} ]]>
+            </if>
+            <if test = "operatingStatementQuery.companyCode !=null">
+                and company_code = #{operatingStatementQuery.companyCode}
+            </if>
+
+        </where>
+        ORDER BY parent_code,level_type,sort,yearmonth desc;
+
+    </select>
+
+    <select id="findListByNotInCompanyCode" resultMap="resultMap"
+            parameterType="com.futuremap.erp.module.operation.entity.OperatingStatementSubQuery">
+
+        SELECT
+        `id`,
+        `yearmonth`,
+        `year`,
+        `month`,
+        os.company_code,
+        ci.company_name,
+        `cexch_name`,
+        `isum`,
+        `inatsum`,
+        `exflag`,
+        `level_type`,
+        `sort`,
+        `parent_code`,
+        class_code,
+        `name`
+        FROM
+        operating_statement os
+        left join (select c.company_code,c.company_name from company_info c) ci on ci.company_code = os.company_code
+        <where>
+            parent_code = class_code
+            <if test="operatingStatementQuery.classCode !=null">
+                and class_code = #{operatingStatementQuery.classCode}
+            </if>
+            <if test="operatingStatementQuery.year !=null">
+                and year = #{operatingStatementQuery.year}
+            </if>
+            <if test = "operatingStatementQuery.companyCode !=null">
+                and os.company_code not in ('0000')
+            </if>
+        </where>
+        ORDER BY parent_code,level_type,sort,yearmonth desc;
+
+    </select>
+
+    <select id="findListByNotInCompanyCodeAndClassCode" resultMap="resultMap"
+            parameterType="com.futuremap.erp.module.operation.entity.OperatingStatementQuery">
+
+        SELECT
+        `id`,
+        `yearmonth`,
+        `year`,
+        `month`,
+        `company_code`,
+        `cexch_name`,
+        `isum`,
+        `inatsum`,
+        `exflag`,
+        `level_type`,
+        `sort`,
+        `parent_code`,
+        class_code,
+        `name`
+        FROM
+        operating_statement
+        <where>
+            1=1
+            <if test="operatingStatementQuery.id !=null">
+                and id = #{operatingStatementQuery.id}
+            </if>
+            <if test="operatingStatementQuery.year !=null">
+                and year = #{operatingStatementQuery.year}
+            </if>
+            <if test = "operatingStatementQuery.startDate !=null">
+                and yearmonth >= #{operatingStatementQuery.startDate}
+            </if>
+            <if test = "operatingStatementQuery.endDate !=null">
+                <![CDATA[   and yearmonth < #{operatingStatementQuery.endDate} ]]>
+            </if>
+            and class_code = classCode
+            <if test = "operatingStatementQuery.companyCode !=null">
+                and company_code not in (#{operatingStatementQuery.companyCode})
+            </if>
+        </where>
+        ORDER BY parent_code,level_type,sort,yearmonth desc;
+
+    </select>
+
+    <select id="sumSubList" resultMap="resultMap"
+            parameterType="com.futuremap.erp.module.operation.entity.OperatingStatementQuery">
+
+        SELECT
+        `id`,
+        `yearmonth`,
+        `year`,
+        `month`,
+        `company_code`,
+        `cexch_name`,
+        sum(`isum`) isum,
+        sum(`inatsum`) inatsum,
+        `exflag`,
+        `level_type`,
+        `sort`,
+        `parent_code`,
+        class_code,
+        `name`
+        FROM
+        operating_statement
+        <where>
+            parent_code = class_code
+            <if test="operatingStatementQuery.classCode !=null">
+                and class_code = #{operatingStatementQuery.classCode}
+            </if>
+            <if test="operatingStatementQuery.year !=null">
+                and year = #{operatingStatementQuery.year}
+            </if>
+            <if test = "operatingStatementQuery.companyCode !=null">
+                and company_code not in ('0000')
+            </if>
+        </where>
+        group by company_code
+        ORDER BY parent_code,level_type,sort,yearmonth desc;
+
+    </select>
+
+    <select id="sumList" resultMap="resultMap"
+            parameterType="com.futuremap.erp.module.operation.entity.OperatingStatementQuery">
+
+        SELECT
+        `id`,
+        `yearmonth`,
+        `year`,
+        `month`,
+        `company_code`,
+        `cexch_name`,
+        sum(`isum`) isum,
+        sum(`inatsum`) inatsum,
+        `exflag`,
+        `level_type`,
+        `sort`,
+        `parent_code`,
+         class_code,
+        `name`
+        FROM
+        operating_statement
+        <where>
+            1=1 and company_code != '0000'
+            <if test="operatingStatementQuery.id !=null">
+                and id = #{operatingStatementQuery.id}
+            </if>
+            <if test="operatingStatementQuery.year !=null">
+                and year = #{operatingStatementQuery.year}
+            </if>
+            <if test = "operatingStatementQuery.startDate !=null">
+                and yearmonth >= #{operatingStatementQuery.startDate}
+            </if>
+            <if test = "operatingStatementQuery.endDate !=null">
+                <![CDATA[   and yearmonth < #{operatingStatementQuery.endDate} ]]>
+            </if>
+            <if test = "operatingStatementQuery.companyCode !=null">
+                and company_code = #{operatingStatementQuery.companyCode}
+            </if>
+
+        </where>
+        group by class_code
+        ORDER BY parent_code,level_type,sort,yearmonth desc;
+
+    </select>
+
+
+
+    <select id="sumCompany" resultMap="resultMap"
+            parameterType="String">
+
+        SELECT
+        `id`,
+        `yearmonth`,
+        `year`,
+        `month`,
+        `company_code`,
+        `cexch_name`,
+        sum(`isum`) isum,
+        sum(`inatsum`) inatsum,
+        `exflag`,
+        `level_type`,
+        `sort`,
+        `parent_code`,
+        class_code,
+        `name`
+        FROM
+        operating_statement
+<!--        <where>-->
+<!--             <if test="operatingStatementQuery.id !=null">-->
+<!--                   and id = #{operatingStatementQuery.id}-->
+<!--             </if>-->
+<!--             <if test = "operatingStatementQuery.startDate !=null">-->
+<!--                   and yearmonth >= #{operatingStatementQuery.startDate}-->
+<!--             </if>-->
+<!--             <if test = "operatingStatementQuery.endDate !=null">-->
+<!--                     <![CDATA[ and yearmonth < #{operatingStatementQuery.endDate}]]>-->
+<!--            </if>-->
+<!--            <if test = "operatingStatementQuery.companyCode !=null">-->
+<!--                and company_code = #{operatingStatementQuery.companyCode}-->
+<!--            </if>-->
+
+<!--        </where>-->
+        where
+          yearmonth = #{yearmonth}
+        <![CDATA[ and company_code <> '0000']]>
+        group by yearmonth,class_code
+        ORDER BY parent_code,level_type,sort;
+
+    </select>
+</mapper>

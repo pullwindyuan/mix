@@ -1,0 +1,58 @@
+spring:
+  profiles:
+    active: local
+# server
+server:
+  port: 8000
+
+# 钱包API配置
+wallet:
+  #由钱包分配
+  merchantMemberNo: tt_123456
+  #如有升级请同步
+  version: v1
+  #钱包接口主地址，由钱包发放该地址
+  baseUrl: https://go-wallet-partner.cg6.co/
+  openApi:
+    withdraw:
+      #由钱包分配，千万不要配置错误，充值和提现是不同的appId-appKey对，充值的appId是以TX开头的
+      appId: TXTJ2FY9NRVMKJC3
+      #由钱包分配，千万不要配置错误，充值和提现是不同的appId-appKey对
+      appKey: TKNi3HZbX5l#Pt6#rN0mUAa9)aO#Zy4f
+      # 创建提现订单
+      create: /match/withdrawOrders/create
+      # 审核提现订单
+      approval: /match/withdrawOrders/approval
+      # 查询提现订单
+      query: /match/withdrawOrders/query
+      # 提现回调地址,请配置成自己的回调地址，这里配的是demo中的演示示例的回调地址，供参考
+      notifyUrl: http://localhost:8000/api/notify/withdraw
+    deposit:
+      #由钱包分配，千万不要配置错误，充值和提现是不同的appId-appKey对，充值的appId是以CZ开头的
+      appId: CZYVXIV30UF125UU
+      #由钱包分配，千万不要配置错误，充值和提现是不同的appId-appKey对
+      appKey: CK6Z*THfs)7Yhm#FmecMrWZTOtuEfs6d
+      # 创建充值订单
+      create: /match/depositOrders/create
+      # 查询充值订单
+      query: /match/depositOrders/query
+      # 充值回调地址,请配置成自己的回调地址，这里配的是demo中的演示示例的回调地址，供参考
+      notifyUrl: http://localhost:8000/api/notify/deposit
+
+# swagger
+swagger:
+  version: 1.0.0
+  license: cg.app
+  licenseUrl: https://www.cg.app
+  termsOfServiceUrl: https://www.cg.app
+  contact:
+    name: pullwind
+    url: https://www.cg.app
+    email: pullwind@cg.app
+
+  title: WalletService
+  description: 钱包接口对接演示服务
+  base-package: com.universe
+
+  #仅仅在开发模式下才能开启
+  enabled: true

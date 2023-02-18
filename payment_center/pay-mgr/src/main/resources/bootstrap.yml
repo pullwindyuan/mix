@@ -1,0 +1,20 @@
+spring:
+  profiles:
+    active: dev
+  application:
+    name: pay-mgr
+  cloud:
+    nacos:
+      config:
+        server-addr: 192.168.1.211:8848
+        file-extension: yml
+      discovery:
+        server-addr: 192.168.1.211:8848
+        heart-beat-interval: 5000
+        heart-beat-timeout: 15000
+  zipkin:
+    base-url: http://localhost:9411/
+    discovery-client-enabled: false
+  # feignClient可以有重复ID
+  main:
+    allow-bean-definition-overriding: true

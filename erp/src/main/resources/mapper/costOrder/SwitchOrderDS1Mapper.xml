@@ -1,0 +1,47 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.futuremap.erp.module.orderCost.mapper.SwitchOrderDS1Mapper">
+    <resultMap id="switchOrder" type="com.futuremap.erp.module.orderCost.entity.SwitchOrder"/>
+
+
+
+    <select id="findList" resultMap="switchOrder" parameterType="com.futuremap.erp.module.orderCost.entity.SwitchOrderQuery">
+        select * from switch_order a
+        <where>
+            <if test="switchOrderQuery.orderDetailCode !=null">
+                and a.order_detail_code = #{switchOrderQuery.orderDetailCode}
+            </if>
+
+            <if test="switchOrderQuery.orderNumber !=null">
+                and a.order_number = #{switchOrderQuery.orderNumber}
+            </if>
+            <if test="switchOrderQuery.productCode !=null">
+                and a.product_code = #{switchOrderQuery.productCode}
+            </if>
+            <if test="switchOrderQuery.ddmonth !=null">
+                and a.ddmonth = #{switchOrderQuery.ddmonth}
+            </if>
+            <if test="switchOrderQuery.orderSwitch !=null">
+                and a.order_switch = #{switchOrderQuery.orderSwitch}
+            </if>
+            <if test="switchOrderQuery.orderNumberSwitch !=null">
+                and a.order_number_switch = #{switchOrderQuery.orderNumberSwitch}
+            </if>
+
+        </where>
+    </select>
+
+    <select id="findListBySwitchCode" resultMap="switchOrder" parameterType="com.futuremap.erp.module.orderCost.entity.SwitchOrderQuery">
+        select * from switch_order a
+
+        <where>
+            <if test="switchOrderQuery.orderSwitch !=null">
+                and a.order_switch = #{switchOrderQuery.orderSwitch}
+            </if>
+            <if test="switchOrderQuery.orderNumberSwitch !=null">
+                and a.order_number_switch = #{switchOrderQuery.orderNumberSwitch}
+            </if>
+
+        </where>
+    </select>
+</mapper>

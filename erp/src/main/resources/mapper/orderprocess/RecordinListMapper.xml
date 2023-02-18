@@ -1,0 +1,146 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.futuremap.erp.module.orderprocess.mapper.RecordinListMapper">
+    <resultMap id="resultMap" type="com.futuremap.erp.module.orderprocess.entity.RecordinList"/>
+    <!--                    cdepcode = '020303'-->
+    <select id="sum" resultMap="resultMap">
+        SELECT
+        sum(`iquantity`) iquantity,
+        sum(t.iCountQuantity) iCountQuantity,
+        sum(`ipunitcost`) ipunitcost
+        FROM
+        recordin_list r
+        left join
+        (select csocode,irowno, sum(iquantity) iCountQuantity from recordin_list
+        <where>
+
+            <if test="recordinQuery.id !=null">
+                and id = #{recordinQuery.id}
+            </if>
+            <if test="recordinQuery.startDate!=null ">
+                and ddate >= #{recordinQuery.startDate}
+            </if>
+            <if test="recordinQuery.endDate!=null ">
+                <![CDATA[and ddate  <  #{recordinQuery.endDate}]]>
+            </if>
+            <if test = "recordinQuery.csocode!=null and recordinQuery.csocode !=''">
+                and csocode = #{recordinQuery.csocode}
+            </if>
+            <if test = "recordinQuery.irowno !=null">
+                and irowno = #{recordinQuery.irowno}
+            </if>
+            <if test = "recordinQuery.ccode!=null and recordinQuery.ccode !=''">
+                and ccode = #{recordinQuery.ccode}
+            </if>
+            <if test = "recordinQuery.companyCode !=null">
+                and company_code = #{recordinQuery.companyCode}
+            </if>
+
+        </where>
+        group by csocode,irowno
+        ) t on r.csocode = t.csocode and r.irowno=t.irowno
+        <where>
+            <if test="recordinQuery.id !=null">
+                and id = #{recordinQuery.id}
+            </if>
+            <if test="recordinQuery.startDate!=null ">
+                and ddate >= #{recordinQuery.startDate}
+            </if>
+            <if test="recordinQuery.endDate!=null ">
+                <![CDATA[and ddate  <  #{recordinQuery.endDate}]]>
+            </if>
+            <if test = "recordinQuery.csocode!=null and recordinQuery.csocode !=''">
+                and r.csocode = #{recordinQuery.csocode}
+            </if>
+            <if test = "recordinQuery.irowno !=null">
+                and r.irowno = #{recordinQuery.irowno}
+            </if>
+            <if test = "recordinQuery.ccode!=null and recordinQuery.ccode !=''">
+                and ccode = #{recordinQuery.ccode}
+            </if>
+            <if test = "recordinQuery.companyCode !=null">
+                and company_code = #{recordinQuery.companyCode}
+            </if>
+        </where>
+        order by ddate desc
+
+    </select>
+    <select id="findList" resultMap="resultMap">
+       SELECT
+               `id`,
+               `company_code`,
+               `company_name`,
+               t.`csocode`,
+               t.`irowno`,
+               `ccode`,
+               `cinvcode`,
+               `cinvname`,
+               `cinvstd`,
+               `cinvm_unit`,
+               `cdepcode`,
+               `cdepname`,
+               `cmocode`,
+               `imoseq`,
+               `ddate`,
+               `iquantity`,
+                t.iCountQuantity,
+               `ipunitcost`,
+               `ipprice`
+       FROM
+               recordin_list r
+             left join
+                (select csocode,irowno, sum(iquantity) iCountQuantity from recordin_list
+                <where>
+
+                    <if test="recordinQuery.id !=null">
+                        and id = #{recordinQuery.id}
+                    </if>
+                    <if test="recordinQuery.startDate!=null ">
+                        and ddate >= #{recordinQuery.startDate}
+                    </if>
+                    <if test="recordinQuery.endDate!=null ">
+                        <![CDATA[and ddate  <  #{recordinQuery.endDate}]]>
+                    </if>
+                    <if test = "recordinQuery.csocode!=null and recordinQuery.csocode !=''">
+                        and csocode = #{recordinQuery.csocode}
+                    </if>
+                    <if test = "recordinQuery.irowno !=null">
+                        and irowno = #{recordinQuery.irowno}
+                    </if>
+                    <if test = "recordinQuery.ccode!=null and recordinQuery.ccode !=''">
+                        and ccode = #{recordinQuery.ccode}
+                    </if>
+                    <if test = "recordinQuery.companyCode !=null">
+                        and company_code = #{recordinQuery.companyCode}
+                    </if>
+
+                </where>
+                 group by csocode,irowno
+            ) t on r.csocode = t.csocode and r.irowno=t.irowno
+        <where>
+            <if test="recordinQuery.id !=null">
+                and id = #{recordinQuery.id}
+            </if>
+            <if test="recordinQuery.startDate!=null ">
+                and ddate >= #{recordinQuery.startDate}
+            </if>
+            <if test="recordinQuery.endDate!=null ">
+                <![CDATA[and ddate  <  #{recordinQuery.endDate}]]>
+            </if>
+            <if test = "recordinQuery.csocode!=null and recordinQuery.csocode !=''">
+                and r.csocode = #{recordinQuery.csocode}
+            </if>
+            <if test = "recordinQuery.irowno !=null">
+                and r.irowno = #{recordinQuery.irowno}
+            </if>
+            <if test = "recordinQuery.ccode!=null and recordinQuery.ccode !=''">
+                and ccode = #{recordinQuery.ccode}
+            </if>
+            <if test = "recordinQuery.companyCode !=null">
+                and company_code = #{recordinQuery.companyCode}
+            </if>
+        </where>
+            order by ddate desc
+
+   </select>
+</mapper>

@@ -1,0 +1,367 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.futuremap.erp.module.saleorder.mapper.SaleOrderMapper">
+    <resultMap id="resultMap" type="com.futuremap.erp.module.saleorder.dto.SaleOrderDto"/>
+
+    <select id="findList" resultMap="resultMap">
+        SELECT
+        `id`,
+        so.`ddate`,
+        so.`csocode`,
+        so.`irowno`,
+        `company_code`,
+        `company_name`,
+        `cpersoncode`,
+        `cpersonname`,
+        `cdepcode`,
+        `cdepname`,
+        `cinvcode`,
+        `cinvname`,
+        `cinvstd`,
+        `cinvm_unit`,
+        so.`ccus_code`,
+        `ccus_abbname`,
+        so.`ccus_name`,
+        `cexch_name`,
+        `iquantity`,
+        `itaxunitprice`,
+        `isum`,
+        `inatsum`,
+        dpredatebt,
+        `dcomplete_date`,
+        `exception_cost`,
+        `exflag`,
+        `status`,
+        sot.ddate saleOutDate,
+        if(oam.back_day != null,oam.back_day,90) back_day,
+        ri.iInQuantity as iInQuantitySum,
+        sot.iOutQuantity as iOutQuantitySum,
+        sw.iSwitchQuantity as iSwitchQuantitySum,
+        if(ri.iInQuantity is not null, iquantity - ri.iInQuantity, iquantity)  as iNotInQuantitySum,
+        if(sot.iOutQuantity is not null, iquantity - sot.iOutQuantity,
+        if(sw.iSwitchQuantity is not null, null, iquantity)) as iNotOutQuantitySum,
+        if(sw.iSwitchQuantity is null, null, iquantity - sw.iSwitchQuantity)  as iNotSwitchQuantitySum,
+        if(sw.iSwitchQuantity is null,'SWITCH_NORMAL',
+            if(TIMESTAMPDIFF(MONTH,DATE_FORMAT(NOW(), '%Y-%m-%d %H:%i:%S'),DATE_FORMAT(so.ddate, '%Y-%m-%d %H:%i:%S')) <![CDATA[>6]]> and iquantity - sw.iSwitchQuantity > 0, 'SWITCH_DELAY',
+                if(TIMESTAMPDIFF(MONTH,DATE_FORMAT(NOW(), '%Y-%m-%d %H:%i:%S'),DATE_FORMAT(so.ddate, '%Y-%m-%d %H:%i:%S')) <![CDATA[<=6]]> and iquantity - sw.iSwitchQuantity > 0,'SWITCH_IN_PROGRESS',
+                    if(TIMESTAMPDIFF(MONTH,DATE_FORMAT(NOW(), '%Y-%m-%d %H:%i:%S'),DATE_FORMAT(so.ddate, '%Y-%m-%d %H:%i:%S')) <![CDATA[>6]]> and iquantity - sw.iSwitchQuantity = 0,'SWITCH_COMPLETED_BUT_DELAY',
+                        if(TIMESTAMPDIFF(MONTH,DATE_FORMAT(NOW(), '%Y-%m-%d %H:%i:%S'),DATE_FORMAT(so.ddate, '%Y-%m-%d %H:%i:%S')) <![CDATA[<=6]]> and iquantity - sw.iSwitchQuantity = 0,'SWITCH_COMPLETED','SWITCH_DELAY'))))
+        ) as swWarningName,
+
+        t.saleBillNatMoney,
+        t.saleBillMoney,
+        t.dvouch_date,
+        t.conlection_money,
+        t.conlection_nat_money,
+        t.no_conlection_money,
+        <!--DATE_ADD(so.ddate,INTERVAL +back_day DAY) arDate,-->
+        <![CDATA[ if(TIMESTAMPDIFF(DAY,DATE_FORMAT(NOW(), '%Y-%m-%d %H:%i:%S'),DATE_FORMAT(so.ddate, '%Y-%m-%d %H:%i:%S'))>=back_day,'RECEIVE_DELAY',
+                    if(TIMESTAMPDIFF(DAY,DATE_FORMAT(NOW(), '%Y-%m-%d %H:%i:%S'),DATE_FORMAT(so.ddate, '%Y-%m-%d %H:%i:%S'))>=30
+                        and TIMESTAMPDIFF(DAY,DATE_FORMAT(NOW(), '%Y-%m-%d %H:%i:%S'),DATE_FORMAT(so.ddate, '%Y-%m-%d %H:%i:%S')) < back_day ,'EMPTY',
+                        if(0=no_conlection_money,'RECEIVE_COMPLETED','EMPTY'))) arWarningName]]>
+
+        FROM
+        sale_order so
+        left join (
+        select saleout_list.csocode,saleout_list.irowno,saleout_list.ddate,sum(saleout_list.iquantity) iOutQuantity from saleout_list
+        <if test = "saleOrderQuery.companyCode !=null">
+            and saleout_list.company_code = #{saleOrderQuery.companyCode}
+        </if>
+        <if test = "saleOrderQuery.csocode!=null and saleOrderQuery.csocode !=''">
+            and saleout_list.csocode = #{saleOrderQuery.csocode}
+        </if>
+        <if test = "saleOrderQuery.irowno !=null">
+            and saleout_list.irowno = #{saleOrderQuery.irowno}
+        </if>
+        group by saleout_list.csocode,saleout_list.irowno
+        ) sot on sot.csocode = so.csocode and sot.irowno = so.irowno
+        left join (
+        select inl.csocode,inl.irowno,sum(inl.iquantity) iInQuantity from recordin_list inl where inl.cdepcode = '020303'
+        <if test = "saleOrderQuery.companyCode !=null">
+            and inl.company_code = #{saleOrderQuery.companyCode}
+        </if>
+        <if test = "saleOrderQuery.csocode!=null and saleOrderQuery.csocode !=''">
+            and inl.csocode = #{saleOrderQuery.csocode}
+        </if>
+        <if test = "saleOrderQuery.irowno !=null">
+            and inl.irowno = #{saleOrderQuery.irowno}
+        </if>
+        group by inl.csocode,inl.irowno
+        ) ri on ri.csocode = so.csocode and ri.irowno = so.irowno
+        left join (
+        select switch.order_switch,switch.order_number_switch,sum(order_count) iSwitchQuantity from switch_order switch
+        <if test = "saleOrderQuery.csocode!=null and saleOrderQuery.csocode !=''">
+            and order_switch = #{saleOrderQuery.csocode}
+        </if>
+        <if test = "saleOrderQuery.irowno !=null">
+            and order_number_switch = #{saleOrderQuery.irowno}
+        </if>
+        group by switch.order_switch,switch.order_number_switch
+        ) sw on sw.order_switch = so.csocode and sw.order_number_switch = so.irowno
+        left join (
+        select oa.customer_code,back_day
+        from order_amount_mgr oa
+        ) oam on oam.customer_code = so.ccus_code
+        left  JOIN (
+            SELECT
+            csocode,
+            irowno,
+            `ccus_code`,
+            `ccus_name`,
+            sum(`bill_nat_money`) saleBillNatMoney,
+            sum(`bill_money`) saleBillMoney ,
+            max(`dvouch_date`) dvouch_date,
+            `receipt_code`,
+            sum(`conlection_money`) conlection_money,
+            sum(`conlection_nat_money`) conlection_nat_money,
+            sum(bill_nat_money-IFNULL(conlection_nat_money,0)) no_conlection_money
+            from
+            sale_bill s
+            <where>
+                <!--conlection_nat_money is not null-->
+                <if test = "saleOrderQuery.companyCode !=null">
+                    and s.company_code = #{saleOrderQuery.companyCode}
+                </if>
+                <if test = "saleOrderQuery.csocode!=null and saleOrderQuery.csocode !=''">
+                    and s.csocode = #{saleOrderQuery.csocode}
+                </if>
+                <if test = "saleOrderQuery.irowno !=null">
+                    and s.irowno = #{saleOrderQuery.irowno}
+                </if>
+                <if test = "saleOrderQuery.ccusCode!=null and saleOrderQuery.ccusCode !=''">
+                    and s.ccus_code = #{saleOrderQuery.ccusCode}
+                </if>
+                <if test = "saleOrderQuery.ccusName !=null and saleOrderQuery.ccusName !=''">
+                    and s.ccus_name = #{saleOrderQuery.ccusName}
+                </if>
+            </where>
+            GROUP BY s.csocode,s.irowno
+        ) t on t.csocode=so.csocode and t.irowno=so.irowno
+        <where>
+            <if test="saleOrderQuery.id !=null">
+                and so.id = #{saleOrderQuery.id}
+            </if>
+            <if test="saleOrderQuery.startDate!=null ">
+                and so.ddate >= #{saleOrderQuery.startDate}
+            </if>
+            <if test="saleOrderQuery.endDate!=null ">
+                <![CDATA[   and so.ddate < #{saleOrderQuery.endDate}]]>
+            </if>
+            <if test = "saleOrderQuery.csocode!=null and saleOrderQuery.csocode !=''">
+                and so.csocode = #{saleOrderQuery.csocode}
+            </if>
+            <if test = "saleOrderQuery.ccusAbbname!=null and saleOrderQuery.ccusAbbname !=''">
+                and so.ccus_abbname like  CONCAT("%",#{saleOrderQuery.ccusAbbname},"%")
+            </if>
+            <if test = "saleOrderQuery.ccusCode !=null">
+                and so.ccus_code = #{saleOrderQuery.ccusCode}
+            </if>
+            <if test = "saleOrderQuery.cpersoncode !=null">
+                and so.cpersoncode = #{saleOrderQuery.cpersoncode}
+            </if>
+            <if test = "saleOrderQuery.cpersonname!=null and saleOrderQuery.cpersonname !=''">
+                and so.cpersonname like  CONCAT("%",#{saleOrderQuery.cpersonname},"%")
+            </if>
+            <if test = "saleOrderQuery.irowno !=null">
+                and so.irowno = #{saleOrderQuery.irowno}
+            </if>
+            <if test = "saleOrderQuery.cinvcode !=null">
+                and so.cinvcode = #{saleOrderQuery.cinvcode}
+            </if>
+            <if test = "saleOrderQuery.companyCode !=null">
+                and so.company_code = #{saleOrderQuery.companyCode}
+            </if>
+            <if test = "saleOrderQuery.ccusName !=null and saleOrderQuery.ccusName !=''">
+                and ccus_name = #{saleOrderQuery.ccusName}
+            </if>
+        </where>
+        order by so.ddate desc ,so.csocode,so.irowno
+
+    </select>
+
+    <select id="sum" resultMap="resultMap">
+        SELECT
+        sum(`iquantity`) iquantity,
+        sum(`isum`) isum,
+        sum(`inatsum`) inatsum,
+        sum(`exception_cost`) exception_cost
+        FROM
+        sale_order
+        <where>
+            <if test="saleOrderQuery.id !=null">
+                and id = #{saleOrderQuery.id}
+            </if>
+            <if test="saleOrderQuery.startDate!=null ">
+                and ddate >= #{saleOrderQuery.startDate}
+            </if>
+            <if test="saleOrderQuery.endDate!=null ">
+                <![CDATA[   and ddate < #{saleOrderQuery.endDate}]]>
+            </if>
+            <if test = "saleOrderQuery.csocode!=null and saleOrderQuery.csocode !=''">
+                and csocode = #{saleOrderQuery.csocode}
+            </if>
+            <if test = "saleOrderQuery.irowno !=null">
+                and irowno = #{saleOrderQuery.irowno}
+            </if>
+            <if test = "saleOrderQuery.ccusAbbname!=null and saleOrderQuery.ccusAbbname !=''">
+                and ccus_abbname like  CONCAT("%",#{saleOrderQuery.ccusAbbname},"%")
+            </if>
+            <if test = "saleOrderQuery.ccusCode !=null">
+                and ccus_code = #{saleOrderQuery.ccusCode}
+            </if>
+            <if test = "saleOrderQuery.cpersoncode !=null">
+                and cpersoncode = #{saleOrderQuery.cpersoncode}
+            </if>
+            <if test = "saleOrderQuery.cpersonname!=null and saleOrderQuery.cpersonname !=''">
+                and cpersonname like  CONCAT("%",#{saleOrderQuery.cpersonname},"%")
+            </if>
+            <if test = "saleOrderQuery.cinvcode !=null">
+                and cinvcode = #{saleOrderQuery.cinvcode}
+            </if>
+            <if test = "saleOrderQuery.companyCode !=null">
+                and company_code = #{saleOrderQuery.companyCode}
+            </if>
+        </where>
+        order by ddate desc ,csocode,irowno
+
+    </select>
+
+    <select id="findOrderByCode" resultMap="resultMap"
+            parameterType="com.futuremap.erp.module.saleorder.entity.SaleOrderQuery">
+        SELECT
+        `id`,
+        `ddate`,
+        `csocode`,
+        `irowno`,
+        `company_code`,
+        `company_name`,
+        `cpersoncode`,
+        `cpersonname`,
+        `cdepcode`,
+        `cdepname`,
+        `cinvcode`,
+        `cinvname`,
+        `cinvstd`,
+        `cinvm_unit`,
+        `ccus_code`,
+        `ccus_abbname`,
+        `ccus_name`,
+        `cexch_name`,
+        `iquantity`,
+        `itaxunitprice`,
+        `isum`,
+        `inatsum`,
+        `dcomplete_date`,
+        `exception_cost`,
+        `exflag`,
+        `status`
+        FROM
+        sale_order
+        <where>
+            <if test="saleOrderQuery.id !=null">
+                and id = #{saleOrderQuery.id}
+            </if>
+            <if test="saleOrderQuery.startDate!=null ">
+                and ddate >= #{saleOrderQuery.startDate}
+            </if>
+            <if test="saleOrderQuery.endDate!=null ">
+                <![CDATA[   and ddate < #{saleOrderQuery.endDate}]]>
+            </if>
+            <if test = "saleOrderQuery.csocode!=null and saleOrderQuery.csocode !=''">
+                and csocode = #{saleOrderQuery.csocode}
+            </if>
+            <if test = "saleOrderQuery.irowno !=null">
+                and irowno = #{saleOrderQuery.irowno}
+            </if>
+        </where>
+        group by csocode
+    </select>
+
+    <select id="findOrderList" resultMap="resultMap">
+        SELECT
+        `id`,
+        `ddate`,
+        `csocode`,
+        `irowno`,
+        `company_code`,
+        `company_name`,
+        `cpersoncode`,
+        `cpersonname`,
+        `cdepcode`,
+        `cdepname`,
+        `cinvcode`,
+        `cinvname`,
+        `cinvstd`,
+        `cinvm_unit`,
+        `ccus_code`,
+        `ccus_abbname`,
+        `ccus_name`,
+        `cexch_name`,
+        `iquantity`,
+        `itaxunitprice`,
+        `isum`,
+        `inatsum`,
+        `dcomplete_date`,
+        `exception_cost`,
+        `exflag`,
+        `status`
+        FROM
+        sale_order
+        <where>
+            csocode in
+            <foreach collection="csocodeList" item="csocode" separator="," open="(" close=")" >
+                #{csocode}
+            </foreach>
+        </where>
+        group by
+        csocode
+    </select>
+
+    <select id="findListFromView" resultMap="resultMap">
+        SELECT *
+        FROM
+        sale_order_process so
+        <if test="saleOrderQuery.cvenName !=null">
+            right join (select po.csocode from purch_order where cven_abbname like CONCAT("%",#{saleOrderQuery.cvenName},"%") or cven_name like CONCAT("%",#{saleOrderQuery.cvenName},"%")) po on po.csocode = so.id
+        </if>
+        <where>
+            <if test="saleOrderQuery.id !=null">
+                and so.id = #{saleOrderQuery.id}
+            </if>
+            <if test="saleOrderQuery.startDate!=null ">
+                and so.ddate >= #{saleOrderQuery.startDate}
+            </if>
+            <if test="saleOrderQuery.endDate!=null ">
+                <![CDATA[   and so.ddate < #{saleOrderQuery.endDate}]]>
+            </if>
+            <if test = "saleOrderQuery.csocode!=null and saleOrderQuery.csocode !=''">
+                and so.csocode = #{saleOrderQuery.csocode}
+            </if>
+            <if test = "saleOrderQuery.ccusAbbname!=null and saleOrderQuery.ccusAbbname !=''">
+                and so.ccus_abbname like  CONCAT("%",#{saleOrderQuery.ccusAbbname},"%")
+            </if>
+            <if test = "saleOrderQuery.ccusCode !=null">
+                and so.ccus_code = #{saleOrderQuery.ccusCode}
+            </if>
+            <if test = "saleOrderQuery.cpersoncode !=null">
+                and so.cpersoncode = #{saleOrderQuery.cpersoncode}
+            </if>
+            <if test = "saleOrderQuery.cpersonname!=null and saleOrderQuery.cpersonname !=''">
+                and so.cpersonname like  CONCAT("%",#{saleOrderQuery.cpersonname},"%")
+            </if>
+            <if test = "saleOrderQuery.irowno !=null">
+                and so.irowno = #{saleOrderQuery.irowno}
+            </if>
+            <if test = "saleOrderQuery.cinvcode !=null">
+                and so.cinvcode = #{saleOrderQuery.cinvcode}
+            </if>
+            <if test = "saleOrderQuery.companyCode !=null">
+                and so.company_code = #{saleOrderQuery.companyCode}
+            </if>
+            <if test = "saleOrderQuery.ccusName !=null and saleOrderQuery.ccusName !=''">
+                and ccus_name = #{saleOrderQuery.ccusName}
+            </if>
+        </where>
+        order by ddate desc ,csocode,irowno
+    </select>
+</mapper>

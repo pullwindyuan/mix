@@ -1,0 +1,138 @@
+server:
+  port: 8080
+#  servlet:
+#    context-path: /api
+
+spring:
+  application:
+    name: futuremaperp
+  datasource:
+    dynamic:
+      strict: true
+      p6spy: true
+      hikari:
+        connection-timeout: 30000
+        max-lifetime: 1800000
+        max-pool-size: 30
+        min-idle: 5
+        connection-test-query: select 1
+        pool-name: FebsHikariCP
+      primary: master
+      datasource:
+        master:
+# pullwind 本地数据库root密码xsw2zaq1
+          url: jdbc:mysql://127.0.0.1:3306/erp?useUnicode=true&characterEncoding=UTF-8&autoReconnect=true&zeroDateTimeBehavior=convertToNull&useSSL=false&allowMultiQueries=true&serverTimezone=GMT%2B8
+          username: root
+          password: xsw2zaq1
+#          url: jdbc:mysql://119.23.35.193:35001/futuremap_erp?useUnicode=true&characterEncoding=UTF-8&autoReconnect=true&zeroDateTimeBehavior=convertToNull&useSSL=false&allowMultiQueries=true&serverTimezone=GMT%2B8
+#          username: bi
+#          password: FZD0YLI17K
+          driver-class-name: com.mysql.cj.jdbc.Driver
+          max-idle: 30
+          max-wait: 1000
+          min-idle: 5
+          initial-size: 5
+          min-evictable-idle-time-millis: 600000
+          time-between-eviction-runs-millis: 300000
+          validation-query: select 1 from dual
+          test-on-borrow: true
+          test-while-idle: true
+          log-abandoned: true
+          remove-abandoned: true
+          remove-abandoned-timeout: 180
+
+        erp002:
+          username: mingo
+          password: mingo789
+          driver-class-name: com.microsoft.sqlserver.jdbc.SQLServerDriver
+          url: jdbc:sqlserver://192.168.16.51:1433;DatabaseName=UFDATA_002_2016
+        erp003:
+          username: mingo
+          password: mingo789
+          driver-class-name: com.microsoft.sqlserver.jdbc.SQLServerDriver
+          url: jdbc:sqlserver://192.168.16.51:1433;DatabaseName=UFDATA_003_2013
+        erp004:
+          username: mingo
+          password: mingo789
+          driver-class-name: com.microsoft.sqlserver.jdbc.SQLServerDriver
+          url: jdbc:sqlserver://192.168.16.51:1433;DatabaseName=UFDATA_004_2016
+        erp006:
+          username: mingo
+          password: mingo789
+          driver-class-name: com.microsoft.sqlserver.jdbc.SQLServerDriver
+          url: jdbc:sqlserver://192.168.16.51:1433;DatabaseName=UFDATA_006_2019
+        erp010:
+          username: mingo
+          password: mingo789
+          driver-class-name: com.microsoft.sqlserver.jdbc.SQLServerDriver
+          url: jdbc:sqlserver://192.168.16.51:1433;DatabaseName=UFDATA_010_2011
+          max-idle: 30
+          max-wait: 100000
+  main:
+    allow-bean-definition-overriding: true
+
+  web:
+    resources:
+      static-locations: classpath:templates/,classpath:static/
+
+mybatis-plus:
+  mapper-locations: classpath:mapper/**/*.xml
+  typeAliasesPackage: com.futuremap.*.module.*.entity
+  global-config:
+    id-type: 0
+    field-strategy: 2
+    db-column-underline: true
+    logic-delete-field: delStatus
+    logic-delete-value: 1
+    logic-not-delete-value: 0
+  configuration:
+    local-cache-scope: statement
+    map-underscore-to-camel-case: true
+    cache-enabled: false
+
+swagger:
+  production: false
+  basic:
+    enable: true
+    path: /swagger-ui.html
+  user:
+    username: admin
+    password: admin
+
+async:
+  executor:
+    thread:
+      core_pool_size: 10
+      max_pool_size: 10
+      queue_capacity: 99999
+      name:
+        prefix: async-service-
+
+security:
+  token:
+    header: X-Auth-Token
+    head: 'Bearer '
+    secret: ca$hc0w1!
+    expiration: 604800
+
+secure:
+  ignored:
+    urls:
+      #       - /auth/**
+      - /csrf
+      - /v2/api-docs
+      - /definitions/**
+      - /configuration/ui
+      - /swagger-resources/**
+      - /configuration/security
+      - /swagger-ui.html
+      - /webjars/**
+      - /swagger-resources/configuration/ui
+      - swagger-ui.html
+      - /sys/register
+      - /sys/login
+      - /operation/operatingStatement/**
+      - /images/*
+      - /fonts/*
+      - /*
+      - /**

@@ -1,0 +1,377 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="org.xxpay.dal.dao.card.mapper.SaDealRecordMapper" >
+  <resultMap id="saDealRecordMap" type="org.xxpay.dal.dao.card.model.SaDealRecord" >
+    <id column="DEAL_RECORD_ID" property="dealRecordId"/>
+    <result column="DEAL_RECORD_NUMBER" property="dealRecordNumber"/>
+    <result column="MERCHANT_ORDER_NUMBER" property="merchantOrderNumber"/>
+    <result column="REFUND_NUMBER" property="refundNumber"/>
+    <result column="LOGIN_ACCOUNT" property="loginAccount"/>
+    <result column="USER_REGION" property="userRegion"/>
+    <result column="PROXY_NUMBER" property="proxyNumber"/>
+    <result column="DEAL_TYPE" property="dealType"/>
+    <result column="PRODUCT_TYPE" property="productType"/>
+    <result column="TRIP_TIME" property="tripTime"/>
+    <result column="ORDER_AMOUNT" property="orderAmount"/>
+    <result column="DEAL_BRING_SCORE_TYPE" property="dealBringScoreType"/>
+    <result column="DEAL_BRING_SCORE_RATE" property="dealBringScoreRate"/>
+    <result column="DEAL_PROXY_ACCOUNT_RATE" property="dealProxyAccountRate"/>
+    <result column="SCORE_RETURN_AMOUNT" property="scoreReturnAmount"/>
+    <result column="USER_AMOUNT" property="userAmount"/>
+    <result column="PARTNER_AMOUNT" property="partnerAmount"/>
+    <result column="ORDER_DETAIL" property="orderDetail"/>
+    <result column="DEAL_DETAIL" property="dealDetail"/>
+    <result column="DEAL_COMMENT" property="dealComment"/>
+    <result column="DEAL_STATUS" property="dealStatus"/>
+    <result column="DEAL_CREATE_TIME" property="dealCreateTime"/>
+    <result column="DEAL_END_TIME" property="dealEndTime"/>
+    <result column="ONESELF_ACCOUNT" property="oneselfAccount"/>
+    <result column="OTHERS_ACCOUNT" property="othersAccount"/>
+    <result column="PROXY_ACCOUNT" property="proxyAccount"/>
+    <result column="ONESELF_CARD_NUMBER" property="oneselfCardNumber"/>
+    <result column="OTHERS_CARD_NUMBER" property="othersCardNumber"/>
+    <result column="PROXY_CARD_NUMBER" property="proxyCardNumber"/>
+    <result column="USER_ID" property="userId"/>
+    <result column="USER_NAME" property="userName"/>
+    <result column="USER_PHONE" property="userPhone"/>
+    <result column="PROXY_PHONE" property="proxyPhone"/>
+    <result column="IS_DELETE" property="IsDelete"/>
+    <result column="FLAG" property="flag"/>
+    <result column="STATUS" property="status"/>
+    
+  </resultMap>
+  
+  <!--表名 -->
+  <sql id="tableName">
+	sa_deal_record
+  </sql>
+	
+  <!-- 字段 -->
+  <sql id="Field">
+	DEAL_RECORD_ID,	
+	DEAL_RECORD_NUMBER,	
+	MERCHANT_ORDER_NUMBER,
+	REFUND_NUMBER,
+	LOGIN_ACCOUNT,
+	USER_REGION,
+	PROXY_NUMBER,
+	DEAL_TYPE,
+	PRODUCT_TYPE,
+	TRIP_TIME,
+	ORDER_AMOUNT,
+	DEAL_BRING_SCORE_TYPE,
+	DEAL_BRING_SCORE_RATE,
+	DEAL_PROXY_ACCOUNT_RATE,
+	SCORE_RETURN_AMOUNT,
+	USER_AMOUNT,
+	PARTNER_AMOUNT,
+	ORDER_DETAIL,
+	DEAL_DETAIL,
+	DEAL_COMMENT,
+	DEAL_STATUS,
+	DEAL_CREATE_TIME,
+	DEAL_END_TIME,
+	ONESELF_ACCOUNT,
+    OTHERS_ACCOUNT,
+    PROXY_ACCOUNT,
+    ONESELF_CARD_NUMBER,
+    OTHERS_CARD_NUMBER,
+    PROXY_CARD_NUMBER,
+	USER_ID,
+	USER_NAME,
+	USER_PHONE,
+	PROXY_PHONE
+  </sql>
+  
+  <sql id="FieldValue">
+  	replace(uuid(),'-',''),
+  	#{dealRecordNumber},
+  	#{merchantOrderNumber},
+  	#{refundNumber},
+  	#{loginAccount},
+  	#{userRegion},
+  	#{proxyNumber},
+  	#{dealType},
+  	#{productType},
+  	#{tripTime},
+  	#{orderAmount},
+  	#{dealBringScoreType},
+  	#{dealBringScoreRate},
+  	#{dealProxyAccountRate},
+  	#{scoreReturnAmount},
+  	#{userAmount},
+  	#{partnerAmount},
+  	#{orderDetail},
+  	#{dealDetail},
+  	#{dealComment},
+  	#{dealStatus},
+  	now(),
+  	#{dealEndTime},
+  	#{oneselfAccount},
+  	#{othersAccount},
+  	#{proxyAccount},
+  	#{oneselfCardNumber},
+  	#{othersCardNumber},
+  	#{proxyCardNumber},
+  	#{userId},
+  	#{userName},
+  	#{userPhone},
+  	#{proxyPhone}
+  </sql>
+  
+  <!-- 查询条件 -->
+  <sql id="select_where_clause">
+  	<if test="dealRecordNumber != null">
+  		and DEAL_RECORD_NUMBER=#{dealRecordNumber}
+  	</if>
+  	<if test="merchantOrderNumber">
+  		and MERCHANT_ORDER_NUMBER=#{merchantOrderNumber}
+  	</if>
+  	<if test="userPhone != null">
+  		and (USER_PHONE=#{userPhone} or PROXY_PHONE=#{userPhone})
+  	</if>
+  	<if test="productType != null">
+  		and PRODUCT_TYPE=#{productType}
+  	</if>
+  	<if test="dealCreateTime != null and dealEndTime != null">
+  		and DEAL_CREATE_TIME<![CDATA[ >= ]]>#{dealCreateTime} and DEAL_CREATE_TIME <![CDATA[ <= ]]> #{dealEndTime}
+  	</if>
+  </sql>	
+  
+  <!-- 查询值 -->
+  <sql id="selectValue">
+	DEAL_RECORD_ID,	
+	DEAL_RECORD_NUMBER,	
+	MERCHANT_ORDER_NUMBER,
+	REFUND_NUMBER,
+	LOGIN_ACCOUNT,
+	USER_REGION,
+	PROXY_NUMBER,
+	DEAL_TYPE,
+	PRODUCT_TYPE,
+	TRIP_TIME,
+	ORDER_AMOUNT,
+	DEAL_BRING_SCORE_TYPE,
+	DEAL_BRING_SCORE_RATE,
+	DEAL_PROXY_ACCOUNT_RATE,
+	SCORE_RETURN_AMOUNT,
+	USER_AMOUNT,
+	PARTNER_AMOUNT,
+	ORDER_DETAIL,
+	DEAL_DETAIL,
+	DEAL_COMMENT,
+	DEAL_STATUS,
+	DATE_FORMAT(DEAL_CREATE_TIME,'%Y-%m-%d %T')AS DEAL_CREATE_TIME,
+	DATE_FORMAT(DEAL_END_TIME,'%Y-%m-%d %T')AS DEAL_END_TIME,
+	ONESELF_ACCOUNT,
+    OTHERS_ACCOUNT,
+    PROXY_ACCOUNT,
+    ONESELF_CARD_NUMBER,
+    OTHERS_CARD_NUMBER,
+    PROXY_CARD_NUMBER,
+	USER_ID,
+	USER_NAME,
+	USER_PHONE,
+	PROXY_PHONE
+  </sql>
+  
+  <insert id="baseInsert">
+	insert into
+		<include refid="tableName"></include>
+		(
+			<include refid="Field"></include>
+		) 
+		values 
+		(
+			<include refid="FieldValue"></include>
+		)
+  </insert>
+  
+  <update id="baseUpdate" parameterType="org.xxpay.dal.dao.card.model.SaDealRecord">
+  	update 	<include refid="tableName"></include>
+  	set DEAL_END_TIME=now()
+  	where DEAL_RECORD_NUMBER=#{dealRecordNumber}
+  </update>
+
+<update id="baseUpdateOrderDetail" parameterType="org.xxpay.dal.dao.card.model.SaDealRecord">
+	update 	<include refid="tableName"></include>
+	set ORDER_DETAIL=#{orderDetail}
+	where DEAL_RECORD_NUMBER=#{dealRecordNumber}
+</update>
+
+  <delete id="baseDelete">
+  	delete from <include refid="tableName"></include>
+  	where DEAL_RECORD_ID=#{dealRecordId}
+  </delete>
+  
+  <delete id="deleteM" parameterType="org.xxpay.dal.dao.card.model.SaDealRecord">
+  	delete from <include refid="tableName"></include>
+  	where MERCHANT_ORDER_NUMBER=#{merchantOrderNumber}
+  </delete>
+  
+  <select id="baseLimitSelect" resultMap="saDealRecordMap">
+	select
+		<include refid="selectValue"></include>
+	from <include refid="tableName"></include>
+	where 1=1
+	<include refid="select_where_clause"></include>
+	order by DEAL_CREATE_TIME desc
+  </select>
+  
+  <select id="baseInfo" resultMap="saDealRecordMap">
+	select
+		<include refid="selectValue"></include>
+	from <include refid="tableName"></include>
+	where 1=1 and MERCHANT_ORDER_NUMBER=#{merchantOrderNumber}
+	and DEAL_TYPE=#{dealType}
+  </select>
+  
+  <!-- 获取当前日期最大的交易记录排序 -->
+  <select id="maxValue" parameterType="java.lang.String" resultType="java.lang.String">
+	select
+		IFNULL((max(DEAL_RECORD_NUMBER)),'0') as DEAL_RECORD_NUMBER
+	from <include refid="tableName"></include>
+	where 1=1
+	<if test="dealCreateTime != null">
+		and DEAL_CREATE_TIME like '${dealCreateTime}%'
+	</if>
+  </select>
+  
+   <!-- 总个数 -->
+  <select id="count" resultType="java.lang.Integer">
+	select
+		IFNULL(count(DEAL_RECORD_ID),0)
+	from <include refid="tableName"></include>
+  </select>
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  <insert id="insertSaDealRecord">
+  	insert into 
+  		<include refid="tableName"></include>
+  	(
+  		<include refid="Field"></include>
+  	)
+  	values(
+  		   replace(uuid(),'-',''),#{dealRecordNumber},#{merchantOrderNumber},#{loginAccount},#{userRegion},
+  		   #{proxyNumber},#{dealType},#{productType},#{tripTime},#{orderAmount},#{dealBringScoreType},
+  		   #{dealBringScoreRate},#{dealProxyAccountRate},#{scoreReturnAmount},#{orderDetail},#{dealDetail},
+  		   #{dealComment},#{dealStatus},#{dealCreateTime},#{dealEndTime},#{userId},#{cardNumber}
+  		   )	
+  </insert>	
+  
+  <delete id="delete" parameterType="String">
+  	update 
+  		<include refid="tableName"></include>
+  	set
+  		IS_DELETE=1
+  	where DEAL_RECORD_ID = #{dealRecordId}
+  </delete>
+  
+  <update id="update">
+  	update 
+  		<include refid="tableName"></include>
+  	set
+  		<if test="dealStatus != null and dealStatus != ''">
+  			DEAL_STATUS=#{dealStatus},
+  		</if>
+  		<if test="dealEndTime != null and dealEndTime != ''">
+  			DEAL_END_TIME=#{dealEndTime},
+  		</if>
+  		DEAL_RECORD_ID = DEAL_RECORD_ID	
+  	where DEAL_RECORD_ID = #{dealRecordId}	
+  </update>
+  
+  <update id="updateSaDealRecord">
+		update
+	        <include refid="tableName"></include>
+	    set
+	    	DEAL_STATUS=1,DEAL_END_TIME=now()
+  	where USER_ID in
+  	<foreach item="item" index="key" collection="maps"
+            open="(" separator="," close=")">
+	    #{key}
+    </foreach>
+     and ISNULL(DEAL_END_TIME)
+  </update>
+  
+  <select id="select" parameterType="String" resultMap="saDealRecordMap">
+  	select 
+  		*
+  	from <include refid="tableName"></include>
+  	where IS_DELETE!=1 and USER_ID=#{userId}
+  	<if test="dealType != null and dealType !=''">
+  		and DEAL_TYPE=#{dealType}
+  	</if>
+  	<if test="productType != null and productType !=''">
+  		and PRODUCT_TYPE=#{productType}
+  	</if>
+  	<if test='dealCreateTime != null and dealCreateTime != ","'>
+		and DEAL_CREATE_TIME <![CDATA[>=substring(#{dealCreateTime},1,LOCATE(",",#{dealCreateTime})-1)]]> 
+		and DEAL_CREATE_TIME <![CDATA[<=substring(#{dealCreateTime},LOCATE(",",#{dealCreateTime})+1)]]>
+  	</if>
+  	order by DEAL_CREATE_TIME desc
+  </select>
+  
+  <!-- <select id="count" parameterType="String" resultType="int">
+  	select
+  		count(DEAL_RECORD_ID)
+  	from <include refid="tableName"></include>
+  	where IS_DELETE!=1 and USER_ID=#{userId}
+  	<if test="dealType != null and dealType !=''">
+  		and DEAL_TYPE=#{dealType}
+  	</if>
+  	<if test="productType != null and productType !=''">
+  		and PRODUCT_TYPE=#{productType}
+  	</if>
+  	<if test='dealCreateTime != null and dealCreateTime != ","'>
+		and DEAL_CREATE_TIME <![CDATA[>=substring(#{dealCreateTime},1,LOCATE(",",#{dealCreateTime})-1)]]> 
+		and DEAL_CREATE_TIME <![CDATA[<=substring(#{dealCreateTime},LOCATE(",",#{dealCreateTime})+1)]]>
+  	</if>
+  </select> -->
+  
+   <select id="totalDeal" parameterType="String" resultType="int">
+  	select
+  		IFNULL(sum(ORDER_AMOUNT),0)
+  	from <include refid="tableName"></include>
+  	where IS_DELETE!=1 and USER_ID=#{userId}
+  	<if test="dealType != null and dealType != ''">
+  		and DEAL_TYPE=#{dealType}
+  	</if>
+  </select>
+  
+   <select id="info" parameterType="String" resultMap="saDealRecordMap">
+  	select 
+  		*
+  	from <include refid="tableName"></include>
+  	<where>
+		<if test="dealRecordId != null and dealRecordId != ''">
+			DEAL_RECORD_ID = #{dealRecordId} and IS_DELETE!=1
+		</if>
+  	</where>
+  </select>
+  
+</mapper>

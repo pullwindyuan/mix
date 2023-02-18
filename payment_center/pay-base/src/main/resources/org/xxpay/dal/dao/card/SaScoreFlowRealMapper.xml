@@ -1,0 +1,382 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="org.xxpay.dal.dao.card.mapper.SaScoreFlowRealMapper" >
+  <resultMap id="saScoreFlowMap" type="org.xxpay.dal.dao.card.model.SaScoreFlow" >
+    <id column="SCORE_FLOW_ID" property="scoreFlowId"/>
+    <result column="DEAL_RECORD_NUMBER" property="dealRecordNumber"/>
+    <result column="MERCHANT_ORDER_NUMBER" property="merchantOrderNumber"/>
+    <result column="TRIP_TIME" property="tripTime"/>
+    <result column="SCORE_FLOW_NUMBER" property="scoreFlowNumber"/>
+    <result column="SCORE_FLOW_DIRECTION" property="scoreFlowDirection"/>
+    <result column="FLOW_TYPE" property="flowType"/>
+    <result column="CURRENT_DEAL_SCORE" property="currentDealScore"/>
+    <result column="REMAIN_SCORE" property="remainScore"/>
+    <result column="ONESELF_ACCOUNT" property="oneselfAccount"/>
+    <result column="OTHERS_ACCOUNT" property="othersAccount"/>
+    <result column="ONESELF_CARD_NUMBER" property="oneselfCardNumber"/>
+    <result column="OTHERS_CARD_NUMBER" property="othersCardNumber"/>
+    <result column="PROXY_ID" property="proxyId"/>
+    <result column="CREATE_TIME" property="createTime"/>
+    <result column="END_TIME" property="endTime"/>
+    <result column="COMMENT" property="comment"/>
+    <result column="BILL_NUMBER" property="billNumber"/>
+    <result column="IS_DELETE" property="isDelete"/>
+    <result column="FLAG" property="flag"/>
+    <result column="STATUS" property="status"/>
+    <result column="USER_ID" property="userId"/>
+    <result column="CARD_TYPE" property="cardType"/>
+    <result column="PRODUCT_TYPE" property="productType"/>
+    <result column="USER_NAME" property="userName"/>
+  </resultMap>
+  
+  <!--表名 -->
+  <sql id="tableName">
+	sa_score_flow_real
+  </sql>
+	
+  <!-- 字段 -->
+  <sql id="Field">
+   SCORE_FLOW_ID,
+   DEAL_RECORD_NUMBER,
+   MERCHANT_ORDER_NUMBER,
+   TRIP_TIME,
+   SCORE_FLOW_NUMBER,
+   SCORE_FLOW_DIRECTION,
+   FLOW_TYPE,
+   CURRENT_DEAL_SCORE,
+   REMAIN_SCORE,
+   ONESELF_ACCOUNT,
+   OTHERS_ACCOUNT,
+   ONESELF_CARD_NUMBER,
+   OTHERS_CARD_NUMBER,
+   PROXY_ID,	
+   CREATE_TIME,
+   END_TIME,
+   COMMENT,
+   BILL_NUMBER,
+   USER_ID,
+   CARD_TYPE,
+   PRODUCT_TYPE,
+   USER_NAME
+  </sql>
+  
+  <!-- 字段值 -->
+  <sql id="FieldValue">
+   replace(uuid(),'-',''),
+   #{dealRecordNumber},
+   #{merchantOrderNumber},
+   #{tripTime},
+   #{scoreFlowNumber},
+   #{scoreFlowDirection},
+   #{flowType},
+   #{currentDealScore},
+   #{remainScore},
+   #{oneselfAccount},
+   #{othersAccount},
+   #{oneselfCardNumber},
+   #{othersCardNumber},
+   #{proxyId},
+   now(),
+   #{endTime},
+   #{comment},
+   #{billNumber},
+   #{userId},
+   #{cardType},
+   #{productType},
+   #{userName}
+  </sql>
+  
+  <!-- 字段 -->
+  <sql id="selectValue">
+   SCORE_FLOW_ID,
+   DEAL_RECORD_NUMBER,
+   MERCHANT_ORDER_NUMBER,
+   TRIP_TIME,
+   SCORE_FLOW_NUMBER,
+   SCORE_FLOW_DIRECTION,
+   FLOW_TYPE,
+   CURRENT_DEAL_SCORE,
+   REMAIN_SCORE,
+   ONESELF_ACCOUNT,
+   OTHERS_ACCOUNT,
+   ONESELF_CARD_NUMBER,
+   OTHERS_CARD_NUMBER,
+   PROXY_ID,	
+   DATE_FORMAT(CREATE_TIME,'%Y-%m-%d %T')AS CREATE_TIME,
+   END_TIME,
+   COMMENT,
+   BILL_NUMBER,
+   USER_ID,
+   CARD_TYPE,
+   PRODUCT_TYPE,
+   FLAG,
+   IS_DELETE,
+   STATUS
+  </sql>
+  
+  <!-- 字段 -->
+  <sql id="selectWebValue">
+   SCORE_FLOW_ID,
+   DEAL_RECORD_NUMBER,
+   MERCHANT_ORDER_NUMBER,
+   DATE_FORMAT(TRIP_TIME,'%Y-%m-%d %T')AS TRIP_TIME,
+   SCORE_FLOW_NUMBER,
+   CASE 
+    WHEN SCORE_FLOW_DIRECTION='0' THEN '支出' 
+    WHEN SCORE_FLOW_DIRECTION='1' THEN '收入' 
+    WHEN SCORE_FLOW_DIRECTION='2' THEN '退款' 
+   END AS SCORE_FLOW_DIRECTION,  	
+   FLOW_TYPE,
+   CURRENT_DEAL_SCORE,
+   REMAIN_SCORE,
+   ONESELF_ACCOUNT,
+   OTHERS_ACCOUNT,
+   ONESELF_CARD_NUMBER,
+   OTHERS_CARD_NUMBER,
+   PROXY_ID,	
+   DATE_FORMAT(CREATE_TIME,'%Y-%m-%d %T')AS CREATE_TIME,
+   DATE_FORMAT(END_TIME,'%Y-%m-%d %T')AS END_TIME,
+   COMMENT,
+   BILL_NUMBER,
+   USER_ID,
+   CARD_TYPE,
+   PRODUCT_TYPE,
+   FLAG,
+   IS_DELETE,
+   STATUS
+  </sql>
+  <!-- 查询条件 -->
+  <sql id="select_where_clause">
+  	<if test="dealRecordNumber != null">
+  		and DEAL_RECORD_NUMBER=#{dealRecordNumber}
+  	</if>
+  	<if test="merchantOrderNumber != null">
+  		and MERCHANT_ORDER_NUMBER=#{merchantOrderNumber}
+  	</if>
+  	<if test="scoreFlowNumber != null">
+  		and SCORE_FLOW_NUMBER=#{scoreFlowNumber}
+  	</if>
+  	<if test="scoreFlowDirection != null and scoreFlowDirection != ''">
+  		and SCORE_FLOW_DIRECTION=#{scoreFlowDirection}
+  	</if>
+  	<if test="flowType != null and flowType != ''">
+  		<!-- and FLOW_TYPE in (${flowType}) -->
+  		and FLOW_TYPE=#{flowType}
+  	</if>
+  	<if test="currentDealScore != null">
+  		and CURRENT_DEAL_SCORE=#{currentDealScore}
+  	</if>
+  	<if test="oneselfAccount != null">
+  		and ONESELF_ACCOUNT=#{oneselfAccount}
+  	</if>
+  	<if test="othersAccount != null">
+  		and OTHERS_ACCOUNT=#{othersAccount}
+  	</if>
+  	<if test="oneselfCardNumber != null">
+  		and ONESELF_CARD_NUMBER=#{oneselfCardNumber}
+  	</if>
+  	<if test="othersCardNumber != null">
+  		and OTHERS_CARD_NUMBER=#{othersCardNumber}
+  	</if>
+  	<if test="userId != null">
+  		and USER_ID=#{userId}
+  	</if>
+  	<if test="cardType != null and cardType != ''">
+  		and CARD_TYPE=#{cardType}
+  	</if>
+  	<if test="flag != null">
+  		<!-- and DATE_SUB(CURDATE(), INTERVAL #{flag} DAY) <![CDATA[ <= ]]>date(CREATE_TIME) -->
+  		and CREATE_TIME<![CDATA[ >= ]]>#{createTime} and CREATE_TIME <![CDATA[ <= ]]> now()
+  	</if>
+  	<if test="createTime != null and endTime != null">
+  		and CREATE_TIME<![CDATA[ >= ]]>#{createTime} and CREATE_TIME <![CDATA[ <= ]]> #{endTime}
+  	</if>
+  	<if test="createTime != null and proxyTime != null">
+  		<!-- and CREATE_TIME like '%${createTime}%' -->
+  		and CREATE_TIME like '%${createTime}%' and CREATE_TIME <![CDATA[ > ]]>#{proxyTime}
+  	</if>
+  	
+  </sql>
+  
+  <select id="countExchange" resultMap="saScoreFlowMap">
+	select
+		<include refid="selectValue"></include>
+	from <include refid="tableName"></include>
+	where SCORE_FLOW_DIRECTION='1' and CARD_TYPE='bd' and FLOW_TYPE in (
+	<foreach collection="list" item="item" separator=",">
+		  	#{item}
+	</foreach>	
+	)
+  </select>
+  
+   <select id="listExchange" parameterType="org.xxpay.dal.dao.card.model.SaScoreFlow" resultMap="saScoreFlowMap">
+	select
+		sum(CURRENT_DEAL_SCORE) AS CURRENT_DEAL_SCORE,
+		USER_ID
+	from <include refid="tableName"></include>
+	where 1=1 and SCORE_FLOW_DIRECTION='1' and IS_DELETE='0'
+	<include refid="select_where_clause"></include>
+	group by USER_ID
+  </select>
+  
+  
+  <insert id="baseInsert">
+	insert into
+		<include refid="tableName"></include>
+		(
+			<include refid="Field"></include>
+		) 
+		values 
+		(
+			<include refid="FieldValue"></include>
+		)
+  </insert>
+<insert id="listInsert" parameterType="java.util.List">
+    insert into
+    <include refid="tableName"></include>
+    (
+    <include refid="Field"></include>
+    )
+    values
+    <foreach collection="list" item="item" index="index" separator=",">
+    (
+        replace(uuid(),'-',''),
+        #{item.dealRecordNumber},
+        #{item.merchantOrderNumber},
+        #{item.tripTime},
+        #{item.scoreFlowNumber},
+        #{item.scoreFlowDirection},
+        #{item.flowType},
+        #{item.currentDealScore},
+        #{item.remainScore},
+        #{item.oneselfAccount},
+        #{item.othersAccount},
+        #{item.oneselfCardNumber},
+        #{item.othersCardNumber},
+        #{item.proxyId},
+        now(),
+        #{item.endTime},
+        #{item.comment},
+        #{item.billNumber},
+        #{item.userId},
+        #{item.cardType},
+        #{item.productType},
+        #{item.userName}
+    )
+    </foreach>
+</insert>
+  <update id="baseUpdate" parameterType="org.xxpay.dal.dao.card.model.SaScoreFlow">
+  	update <include refid="tableName"></include>
+  	set 
+  		<if test="isDelete != null and isDelete != ''">
+  			IS_DELETE=#{isDelete}
+  		</if>
+	where USER_ID=#{userId} 
+  </update>
+  
+  <delete id="baseDelete">
+  	delete from <include refid="tableName"></include>
+  	where SCORE_FLOW_ID=#{scoreFlowId}
+  </delete>
+  
+  <select id="baseLimitSelect" parameterType="org.xxpay.dal.dao.card.model.SaScoreFlow" resultMap="saScoreFlowMap">
+	select
+		<include refid="selectValue"></include>
+	from <include refid="tableName"></include>
+	where 1=1 and CURRENT_DEAL_SCORE > 0
+	<include refid="select_where_clause"></include>
+	order by CREATE_TIME desc
+  </select>
+  
+  <!-- 后台明细接口 -->
+  <select id="limitList" parameterType="org.xxpay.dal.dao.card.model.SaScoreFlow" resultMap="saScoreFlowMap">
+	select
+		<include refid="selectWebValue"></include>
+	from <include refid="tableName"></include>
+	where 1=1 and CURRENT_DEAL_SCORE > 0
+	<include refid="select_where_clause"></include>
+	order by CREATE_TIME desc
+  </select>
+  
+  <select id="baseInfo" resultMap="saScoreFlowMap">
+	select
+		<include refid="Field"></include>
+	from <include refid="tableName"></include>
+	where 1=1 and SCORE_FLOW_ID=#{scoreFlowId}
+  </select>
+  
+  <!-- 昨日收益可用比豆 -->
+  <select id="yesterTotal" parameterType="org.xxpay.dal.dao.card.model.SaScoreFlow" resultType="java.lang.Long">
+  	select IFNULL(sum(CURRENT_DEAL_SCORE),0)
+  	from <include refid="tableName"></include>
+  	where 1=1 and SCORE_FLOW_DIRECTION=#{scoreFlowDirection} and (TRIP_TIME LIKE '%${tripTime}%' or CREATE_TIME like '%${tripTime}%')
+  	and USER_ID=#{userId}
+  </select>
+  
+  <!-- 合伙人明细昨日收益可用比豆 -->
+  <select id="partnerYesterTotal" parameterType="org.xxpay.dal.dao.card.model.SaScoreFlow" resultType="java.lang.Long">
+	select IFNULL(sum(CURRENT_DEAL_SCORE),0)
+  	from <include refid="tableName"></include>
+  	where 
+  		1=1 and SCORE_FLOW_DIRECTION='1' 
+  		and (TRIP_TIME LIKE '%${tripTime}%' or CREATE_TIME like '%${tripTime}%')
+  		<!-- and CREATE_TIME<![CDATA[ >= ]]>#{proxyTime} -->
+  		and CARD_TYPE=#{cardType}
+  		and USER_ID=#{userId}
+  </select>
+  
+  <!-- 合伙人明细累计收益 -->
+  <select id="partnerCount" parameterType="org.xxpay.dal.dao.card.model.SaScoreFlow" resultType="java.lang.Long">
+	select IFNULL(sum(CURRENT_DEAL_SCORE),0)
+  	from <include refid="tableName"></include>
+  	where 
+  		1=1 and SCORE_FLOW_DIRECTION=#{scoreFlowDirection}
+  		<!-- and CREATE_TIME<![CDATA[ >= ]]>#{proxyTime} -->
+  		and CARD_TYPE=#{cardType}
+  		and USER_ID=#{userId}
+  </select>
+  
+  <!-- 合伙人明细-每日收益(只需要日期) -->
+  <select id="partnerEveryday" parameterType="org.xxpay.dal.dao.card.model.SaScoreFlow" resultMap="saScoreFlowMap">
+	select 
+		DATE_FORMAT(CREATE_TIME,'%Y-%m-%d')AS CREATE_TIME,SUM(CURRENT_DEAL_SCORE)AS CURRENT_DEAL_SCORE 
+	from <include refid="tableName"></include>
+	where 
+		1=1 and SCORE_FLOW_DIRECTION='1'
+		and USER_ID=#{userId}
+		and CARD_TYPE=#{cardType}
+		<!-- and CREATE_TIME<![CDATA[ >= ]]>#{proxyTime} -->
+		<if test="flag != null">
+  			and DATE_SUB(CURDATE(), INTERVAL #{flag} DAY) <![CDATA[ <= ]]>date(CREATE_TIME)
+  		</if>
+		group by DATE_FORMAT(CREATE_TIME,'%Y-%m-%d')
+		order by DATE_FORMAT(CREATE_TIME,'%Y-%m-%d') desc	
+  </select>
+  
+  <!-- 合伙人发展会员数量消费总数 -->
+  <select id="partnerFlowCount" parameterType="org.xxpay.dal.dao.card.model.SaScoreFlow" resultType="java.lang.Integer">
+	select
+		IFNULL(count(SCORE_FLOW_ID),0)
+	from <include refid="tableName"></include>
+	where  1=1 and SCORE_FLOW_DIRECTION='1' and PROXY_ID=#{proxyId}	
+  </select>
+   
+  <!-- 获取当前日期最大的流水排序 -->
+  <select id="maxValue" parameterType="java.lang.String" resultType="java.lang.String">
+	select
+		IFNULL((max(SCORE_FLOW_NUMBER)),'0') as SCORE_FLOW_NUMBER
+	from <include refid="tableName"></include>
+	where 1=1
+	<if test="createTime != null">
+		and CREATE_TIME like '${createTime}%'
+	</if>
+  </select>
+  
+  <!-- 总个数 -->
+  <select id="count" resultType="java.lang.Integer">
+	select
+		IFNULL(count(SCORE_FLOW_ID),0)
+	from <include refid="tableName"></include>
+  </select>
+  
+</mapper>

@@ -1,0 +1,9 @@
+/.idea
+/pay-common/target
+/pay-base/target
+/payment-client/target
+/pay-mgr/target
+/pay-service/target
+/pay-shop/target
+/log
+*.iml

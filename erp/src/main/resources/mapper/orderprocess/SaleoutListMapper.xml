@@ -1,0 +1,144 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.futuremap.erp.module.orderprocess.mapper.SaleoutListMapper">
+    <resultMap id="resultMap" type="com.futuremap.erp.module.orderprocess.entity.SaleoutList"/>
+    <select id="sum" resultMap="resultMap">
+        SELECT
+        sum(`iquantity`) iquantity,
+        sum(t.iCountQuantity) iCountQuantity,
+        sum(foutquantity) foutquantity,
+        sum(isum) isum,
+        sum(inatsum) inatsum,
+        sum(t.iCountNatsum) iCountNatsum
+        FROM
+        saleout_list r
+        left join
+        (select csocode,irowno,cinvcode,sum(iquantity) iCountQuantity,sum(inatsum) iCountNatsum from saleout_list
+        <where>
+            <if test="saleoutQuery.id !=null">and id = #{saleoutQuery.id}
+            </if>
+            <if test="saleoutQuery.startDate!=null ">
+                and ddate >= #{saleoutQuery.startDate}
+            </if>
+            <if test="saleoutQuery.endDate!=null ">
+                <![CDATA[and ddate  <  #{saleoutQuery.endDate}]]>
+            </if>
+            <if test = "saleoutQuery.csocode!=null and saleoutQuery.csocode !=''">
+                and csocode = #{saleoutQuery.csocode}
+            </if>
+            <if test = "saleoutQuery.irowno !=null">
+                and irowno = #{saleoutQuery.irowno}
+            </if>
+            <if test = "saleoutQuery.ccode!=null and saleoutQuery.ccode !=''">
+                and ccode = #{saleoutQuery.ccode}
+            </if>
+            <if test = "saleoutQuery.companyCode !=null">
+                and company_code = #{saleoutQuery.companyCode}
+            </if>
+
+        </where>
+        group  by  csocode,irowno,cinvcode
+        ) t  on r.csocode = t.csocode and r.irowno=t.irowno and r.cinvcode=t.cinvcode
+        <where>
+            <if test="saleoutQuery.id !=null">
+                and r.id = #{saleoutQuery.id}
+            </if>
+            <if test="saleoutQuery.startDate!=null ">
+                and ddate >= #{saleoutQuery.startDate}
+            </if>
+            <if test="saleoutQuery.endDate!=null ">
+                <![CDATA[and ddate  <  #{saleoutQuery.endDate}]]>
+            </if>
+            <if test = "saleoutQuery.csocode!=null and saleoutQuery.csocode !=''">
+                and r.csocode = #{saleoutQuery.csocode}
+            </if>
+            <if test = "saleoutQuery.irowno !=null">
+                and r.irowno = #{saleoutQuery.irowno}
+            </if>
+            <if test = "saleoutQuery.ccode!=null and saleoutQuery.ccode !=''">
+                and ccode = #{saleoutQuery.ccode}
+            </if>
+            <if test = "saleoutQuery.companyCode !=null">
+                and company_code = #{saleoutQuery.companyCode}
+            </if>
+        </where>
+        order by ddate desc
+    </select>
+    <select id="findList" resultMap="resultMap">
+        SELECT
+        `id`,
+        `company_code`,
+        `company_name`,
+        r.`csocode`,
+        r.`irowno`,
+        r.`cinvcode`,
+        `cinvname`,
+        `cinvstd`,
+        `cinvm_unit`,
+        `ccode`,
+        `ddate`,
+        `iquantity`,
+        t.iCountQuantity,
+        foutquantity,
+        isum,
+        inatsum,
+        t.iCountNatsum,
+        <![CDATA[if(ddate > dcomplete_date,'SALE_DELAY','EMPTY') warningName]]>
+        FROM
+        saleout_list r
+        left join (
+                select sale_order.csocode,sale_order.irowno,sale_order.dcomplete_date from sale_order
+                ) so on so.csocode = r.csocode and so.irowno=r.irowno
+        left join
+        (select csocode,irowno,cinvcode,sum(iquantity) iCountQuantity,sum(inatsum) iCountNatsum from saleout_list
+            <where>
+                    <if test="saleoutQuery.id !=null">and id = #{saleoutQuery.id}
+                    </if>
+                    <if test="saleoutQuery.startDate!=null ">
+                        and ddate >= #{saleoutQuery.startDate}
+                    </if>
+                    <if test="saleoutQuery.endDate!=null ">
+                        <![CDATA[and ddate  <  #{saleoutQuery.endDate}]]>
+                    </if>
+                    <if test = "saleoutQuery.csocode!=null and saleoutQuery.csocode !=''">
+                        and csocode = #{saleoutQuery.csocode}
+                    </if>
+                    <if test = "saleoutQuery.irowno !=null">
+                        and irowno = #{saleoutQuery.irowno}
+                    </if>
+                    <if test = "saleoutQuery.ccode!=null and saleoutQuery.ccode !=''">
+                        and ccode = #{saleoutQuery.ccode}
+                    </if>
+                    <if test = "saleoutQuery.companyCode !=null">
+                        and company_code = #{saleoutQuery.companyCode}
+                    </if>
+
+                </where>
+                group  by  csocode,irowno,cinvcode
+             ) t  on r.csocode = t.csocode and r.irowno=t.irowno and r.cinvcode=t.cinvcode
+        <where>
+            <if test="saleoutQuery.id !=null">
+                and r.id = #{saleoutQuery.id}
+            </if>
+            <if test="saleoutQuery.startDate!=null ">
+                and ddate >= #{saleoutQuery.startDate}
+            </if>
+            <if test="saleoutQuery.endDate!=null ">
+                <![CDATA[and ddate  <  #{saleoutQuery.endDate}]]>
+            </if>
+            <if test = "saleoutQuery.csocode!=null and saleoutQuery.csocode !=''">
+                and r.csocode = #{saleoutQuery.csocode}
+            </if>
+            <if test = "saleoutQuery.irowno !=null">
+                and r.irowno = #{saleoutQuery.irowno}
+            </if>
+            <if test = "saleoutQuery.ccode!=null and saleoutQuery.ccode !=''">
+                and ccode = #{saleoutQuery.ccode}
+            </if>
+            <if test = "saleoutQuery.companyCode !=null">
+                and company_code = #{saleoutQuery.companyCode}
+            </if>
+        </where>
+            order by ddate desc
+    </select>
+</mapper>
